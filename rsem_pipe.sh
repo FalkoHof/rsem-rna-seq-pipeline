@@ -53,10 +53,10 @@ fi
 ##### Obtain Parameters from mapping file using $PBS_ARRAY_INDEX as line number
 input_mapper=`sed -n "${PBS_ARRAY_INDEX} p" $pbs_mapping_file` #read mapping file
 names_mapped=($input_mapper)
-sample_dir=${names_mapped[1]} # get the sample dir from the mapping array
+sample_dir=${names_mapped[1]} # get the sample dir
 sample_name=`basename $sample_dir` #get the base name of the dir as sample name
 
-echo 'Starting RSEM RNA-seq pipeline for: '${NAME}
+echo 'Starting RSEM RNA-seq pipeline for: '$sample_name
 echo 'Rsem reference: ' $rsem_ref
 echo 'Aligner to be used: ' $aligner
 echo 'Mapping file: ' $pbs_mapping_file
@@ -90,4 +90,4 @@ fi
 if [ $clean -eq 1]: then
   rm -rf $temp_dir
 fi
-echo 'Finished RSEM RNA-seq pipeline for: '${NAME}
+echo 'Finished RSEM RNA-seq pipeline for: '$sample_name
