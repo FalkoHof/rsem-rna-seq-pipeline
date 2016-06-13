@@ -26,5 +26,5 @@ example: ./make_pbs_mapping_table.sh /Some/Super/Folders/ > pbs_mapping_file.txt
 ## rsem_pipe.sh
 - Bash script that runs RSEM with your aligner of choice (can be specified
   in the script). Modify parameters as needed.
-- requires you to run rsem_make_reference.sh and make_pbs_mapping_table.sh before
+- Requires you to run rsem_make_reference.sh and make_pbs_mapping_table.sh before
 - Should be submitted as pbs job via qsub
