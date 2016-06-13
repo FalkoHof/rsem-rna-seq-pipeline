@@ -12,8 +12,8 @@
 ##### specify folders and variables #####
 annotation_file=
 fasta_file=
-ref_dir=
-aligner='bowtie'
+out_dir=
+aligner="bowtie"
 
 ##### load required modules #####
 module load RSEM/1.2.29-foss-2015a
@@ -35,10 +35,10 @@ fi
 echo 'Building rsem reference...'
 echo 'Annotation file: ' $annotation_file
 echo 'Fasta file: ' $fasta_file
-echo 'Output directory: ' $ref_dir
+echo 'Output directory: ' $out_dir
 echo 'Aligner to be used: ' $aligner
 
 rsem-prepare-reference --num-threads 8 --gtf $gft_file --$aligner \
-  $fasta_file $ref_dir
+  $fasta_file $out_dir
 
 echo 'Building rsem reference... - Done'
