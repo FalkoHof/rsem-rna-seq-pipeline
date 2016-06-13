@@ -17,24 +17,23 @@ make_plots=1
 #3. delete unecessary files from temp_dir
 clean=0
 ##### specify RSEM parameters
-alginer='bowtie'
+alginer="bowtie"
 
 ##### specify folders and variables #####
 #set script dir
 pipe_dir=/lustre/scratch/users/$USER/pipes/rsem-rna-seq-pipeline
 #set ouput base dir
 base_dir=/lustre/scratch/users/$USER/rna_seq
-#folders for input fastq files
-fastq_files=
-#folders for temp files
-temp_dir=$base_dir/temp
 #folder for aligment logs
 log_files=$base_dir/logs
 #folder for rsem reference
 rsem_ref=
+#location of the mapping file for the array job
+pbs_mapping_file=
+#super folder of the temp dir, script will create subfolders with $sample_name
+temp_dir=$base_dir/temp/
 
-##### load modules and assign local repos#####
-##### load required modules #####
+##### conditional loading of the required modules #####
 module load RSEM/1.2.29-foss-2015a
 # conditional loading of modules based on aligner to be used by RSEM
 if [ "$aligner" -eq "bowtie" ]; then
@@ -52,18 +51,43 @@ if [ $make_plots -eq 1 ]; then
 
 fi
 ##### Obtain Parameters from mapping file using $PBS_ARRAY_INDEX as line number
-input_mapper=`sed -n "${PBS_ARRAY_INDEX} p" $mapping_file`
+input_mapper=`sed -n "${PBS_ARRAY_INDEX} p" $pbs_mapping_file` #read mapping file
 names_mapped=($input_mapper)
-sample_name=${names_mapped[1]}
+sample_dir=${names_mapped[1]} # get the sample dir from the mapping array
+sample_name=`basename $sample_dir` #get the base name of the dir as sample name
 
 echo 'Starting RSEM RNA-seq pipeline for: '${NAME}
 echo 'Rsem reference: ' $rsem_ref
 echo 'Aligner to be used: ' $aligner
+echo 'Mapping file: ' $pbs_mapping_file
 
-rsem-calculate-expression --num-threads 8 \
-  --paired-end $fastq_files/${NAME}.end1.fq $fastq_files/${NAME}.end2.fq \
-  $rsem_ref $sample_name
+#make output folder
+mkdir $sample_dir/rsem/
+cd $sample_dir/rsem/
 
-rsem-plot-model $sample_name $sample_name.pdf
+#folders for temp files
+temp_dir=$temp_dir/$sample_name
+mkdir -p $temp_dir
 
+#run rsem to calculate the expression levels
+if [ $run_rsem -eq 1 ]; then
+  rsem-calculate-expression --num-threads 8 --temporary-folder $temp_dir \
+    --fragment-length-min #TODO: check with Michael for the actual sizes
+    --fragment-length-max
+    --fragment-length-mean
+    --estimate-rspd # estimate read start position to check if the data has bias
+    --output-genome-bam #output bam file as genomic, not transcript coordinates
+    --paired-end $sample_dir/unmapped.1.fastq $sample_dir/unmapped.2.fastq \
+    $rsem_ref $sample_name >& $log_files/$sample_name.rsem
+fi
+
+#run the rsem plot function
+if [ $make_plots -eq 1 ]; then
+  rsem-plot-model $sample_dir $sample_dir/$sample_name.pdf
+fi
+
+#delete the temp files
+if [ $clean -eq 1]: then
+  rm -rf $temp_dir
+fi
 echo 'Finished RSEM RNA-seq pipeline for: '${NAME}
