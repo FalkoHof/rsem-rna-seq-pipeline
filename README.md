@@ -17,7 +17,8 @@ This repository contains a collections of scripts to map RNA-seq data via
   mapping of <line number> <dir> to stdout.
   Pipe the output to a file and specifiy this file in the rsem_pipe.sh script.
 - Warning: only works on systems with gnu readlink installed. (Cluster & linux
-  is fine, for the Mac you need to install readlink e.g. via Homebrew)
+  is fine, for the Mac you need to install readlink e.g. via Homebrew, no idea
+  where Cygwin stands on that)
 ```
 example: ./make_pbs_mapping_table.sh /Some/Super/Folders/ > pbs_mapping_file.txt
 ```
