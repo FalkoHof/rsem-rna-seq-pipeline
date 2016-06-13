@@ -1,4 +1,4 @@
-# Nodine Lab STAR/RSEM RNA-seq pipeline
+# Nodine Lab RSEM RNA-seq pipeline
 This repository contains a collections of scripts to map RNA-seq data via
 [STAR](https://github.com/alexdobin/STAR) and quantify the mapped reads via
 [RSEM](https://github.com/deweylab/RSEM).
