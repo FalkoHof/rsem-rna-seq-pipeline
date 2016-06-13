@@ -13,10 +13,11 @@ This repository contains a collections of scripts to map RNA-seq data via
 ## make_pbs_mapping_table.sh
 - Bash script to create a mapping file for pbs array jobs.
 - Should be run via the standard shell environment and needs an folder as
-  command line argument. The script will search for bam files ind the folder and
-  output a mapping of <line number> <basename bam files> to stdout.
+  command line argument. The script will list the subfolders and output a
+  mapping of <line number> <dir> to stdout.
   Pipe the output to a file and specifiy this file in the rsem_pipe.sh script.
-
+- Warning: only works on systems with gnu readlink installed. (Cluster & linux
+  is fine, for the Mac you need to install readlink e.g. via Homebrew)
 ```
 example: ./make_pbs_mapping_table.sh /Some/Super/Folders/ > pbs_mapping_file.txt
 ```
