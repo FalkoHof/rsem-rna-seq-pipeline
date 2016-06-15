@@ -12,7 +12,7 @@
 ##### specify folders and variables #####
 annotation_file=/lustre/scratch/users/$USER/Ath_annotations/nod_v01/Arabidopsis_thaliana.TAIR10.30.nod_v01.gtf
 fasta_file=/lustre/scratch/users/$USER/indices/fasta/Col_mS.fa
-out_dir=/lustre/scratch/users/falko.hofmann/indices/rsem/
+out_dir=/lustre/scratch/users/falko.hofmann/indices/rsem/nod_v01
 aligner="star"
 
 ##### load required modules #####
