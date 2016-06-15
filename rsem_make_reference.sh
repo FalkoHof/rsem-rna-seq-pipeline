@@ -4,16 +4,16 @@
 #PBS -J 1
 #PBS -j oe
 #PBS -q workq
-#PBS -o /lustre/scratch/users/falko.hofmann/log/160603/160603_make_rsem_reference.log
+#PBS -o /lustre/scratch/users/falko.hofmann/log/160615/160615_make_rsem_reference.log
 #PBS -l walltime=1:00:00
 #PBS -l select=1:ncpus=8:mem=64gb
 
 # === begin ENVIRONMENT SETUP ===
 ##### specify folders and variables #####
-annotation_file=
-fasta_file=
-out_dir=
-aligner="bowtie"
+annotation_file=/lustre/scratch/users/$USER/Ath_annotations/nod_v01/Arabidopsis_thaliana.TAIR10.30.nod_v01.gtf
+fasta_file=/lustre/scratch/users/$USER/indices/fasta/Col_mS.fa
+out_dir=/lustre/scratch/users/falko.hofmann/indices/rsem/
+aligner="star"
 
 ##### load required modules #####
 module load RSEM/1.2.29-foss-2015a
