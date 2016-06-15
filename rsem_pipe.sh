@@ -74,7 +74,7 @@ if [ $run_rsem -eq 1 ]; then
   rsem-calculate-expression --num-threads 8 --temporary-folder $temp_dir \
     --fragment-length-min #TODO: check with Michael for the actual sizes
     --fragment-length-max
-    --fragment-length-mean
+    --fragment-length-mean 200
     --estimate-rspd # estimate read start position to check if the data has bias
     --output-genome-bam #output bam file as genomic, not transcript coordinates
     --paired-end $sample_dir/unmapped.1.fastq $sample_dir/unmapped.2.fastq \
