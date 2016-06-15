@@ -4,9 +4,9 @@
 #PBS -J 1-12
 #PBS -j oe
 #PBS -q workq
-#PBS -o /lustre/scratch/users/falko.hofmann/log/160603_rsem-rna/160603_rsem-rna_^array_index^_mapping.log
+#PBS -o /lustre/scratch/users/falko.hofmann/log/160615_rsem-rna/160615_rsem-rna_^array_index^_mapping.log
 #PBS -l walltime=24:00:00
-#PBS -l select=1:ncpus=8:mem=64gb
+#PBS -l select=1:ncpus=8:mem=32gb
 
 # === begin ENVIRONMENT SETUP ===
 ####set to 0 (false) or 1 (true) to let the repsective code block run
@@ -17,7 +17,7 @@ make_plots=1
 #3. delete unecessary files from temp_dir
 clean=0
 ##### specify RSEM parameters
-alginer="bowtie"
+alginer="star"
 
 ##### specify folders and variables #####
 #set script dir
@@ -27,7 +27,7 @@ base_dir=/lustre/scratch/users/$USER/rna_seq
 #folder for aligment logs
 log_files=$base_dir/logs
 #folder for rsem reference
-rsem_ref=
+rsem_ref=/lustre/scratch/users/falko.hofmann/indices/rsem/
 #location of the mapping file for the array job
 pbs_mapping_file=
 #super folder of the temp dir, script will create subfolders with $sample_name
@@ -77,6 +77,8 @@ if [ $run_rsem -eq 1 ]; then
     --fragment-length-mean 200
     --estimate-rspd # estimate read start position to check if the data has bias
     --output-genome-bam #output bam file as genomic, not transcript coordinates
+    --seed 12345 #set seed for reproducibility of rng
+    --ci-memory 30000
     --paired-end $sample_dir/unmapped.1.fastq $sample_dir/unmapped.2.fastq \
     $rsem_ref $sample_name >& $log_files/$sample_name.rsem
 fi
