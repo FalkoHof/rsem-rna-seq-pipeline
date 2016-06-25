@@ -1,11 +1,10 @@
 #!/bin/bash
 #PBS -P rnaseq_nod
 #PBS -N make_rsem_reference
-#PBS -J 1
 #PBS -j oe
 #PBS -q workq
 #PBS -o /lustre/scratch/users/falko.hofmann/log/160625/160625_make_rsem_reference.log
-#PBS -l walltime=1:00:00
+#PBS -l walltime=00:30:00
 #PBS -l select=1:ncpus=8:mem=64gb
 
 # === begin ENVIRONMENT SETUP ===
@@ -19,14 +18,14 @@ out_dir=/lustre/scratch/users/falko.hofmann/indices/rsem/$aligner/nod_v01
 module load RSEM/1.2.29-foss-2015a
 
 # conditional loading of modules based on aligner to be used by RSEM
-if [ "$aligner" -eq "bowtie" ]; then
+if [ $aligner -eq "bowtie" ]; then
   module load Bowtie/1.1.2-foss-2015b
 fi
-if [ "$aligner" -eq "bowtie2" ]; then
+if [ $aligner -eq "bowtie2" ]; then
   module load Bowtie2/2.2.7-foss-2015b
 fi
 #TODO:star not yet supported? if so add star mapping command in rsem_pipe
-if [ "$aligner" -eq "star" ]; then
+if [ $aligner -eq "star" ]; then
   module load STAR/2.5.1b-goolf-1.4.10
 fi
 
