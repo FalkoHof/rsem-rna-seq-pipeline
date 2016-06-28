@@ -17,7 +17,7 @@ make_plots=1
 #3. delete unecessary files from temp_dir
 clean=0
 ##### specify RSEM parameters
-alginer="star"
+alginer="bowtie2"
 
 ##### specify folders and variables #####
 #set script dir
@@ -36,14 +36,14 @@ temp_dir=$base_dir/temp/
 ##### conditional loading of the required modules #####
 module load RSEM/1.2.29-foss-2015a
 # conditional loading of modules based on aligner to be used by RSEM
-if [ "$aligner" -eq "bowtie" ]; then
+if [ $aligner == "bowtie" ]; then
   module load Bowtie/1.1.2-foss-2015b
 fi
-if [ "$aligner" -eq "bowtie2" ]; then
+if [ $aligner == "bowtie2" ]; then
   module load Bowtie2/2.2.7-foss-2015b
 fi
 #TODO: --star not yet supported? if so add star mapping command
-if [ "$aligner" -eq "star" ]; then
+if [ $aligner == "star" ]; then
   module load STAR/2.5.1b-goolf-1.4.10
 fi
 if [ $make_plots -eq 1 ]; then
@@ -72,8 +72,8 @@ mkdir -p $temp_dir
 #run rsem to calculate the expression levels
 if [ $run_rsem -eq 1 ]; then
   rsem-calculate-expression --num-threads 8 --temporary-folder $temp_dir \
-    --fragment-length-min #TODO: check with Michael for the actual sizes
-    --fragment-length-max
+    --fragment-length-min 50
+    --fragment-length-max 500
     --fragment-length-mean 200
     --estimate-rspd # estimate read start position to check if the data has bias
     --output-genome-bam #output bam file as genomic, not transcript coordinates
