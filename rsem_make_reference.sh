@@ -18,14 +18,14 @@ out_dir=/lustre/scratch/users/falko.hofmann/indices/rsem/$aligner/nod_v01
 module load RSEM/1.2.29-foss-2015a
 
 # conditional loading of modules based on aligner to be used by RSEM
-if [ $aligner -eq "bowtie" ]; then
+if [ $aligner == "bowtie" ]; then
   module load Bowtie/1.1.2-foss-2015b
 fi
-if [ $aligner -eq "bowtie2" ]; then
+if [ $aligner == "bowtie2" ]; then
   module load Bowtie2/2.2.7-foss-2015b
 fi
 #TODO:star not yet supported? if so add star mapping command in rsem_pipe
-if [ $aligner -eq "star" ]; then
+if [ $aligner == "star" ]; then
   module load STAR/2.5.1b-goolf-1.4.10
 fi
 
