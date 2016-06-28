@@ -68,12 +68,12 @@ mkdir $sample_dir/rsem/
 cd $sample_dir/rsem/
 
 #folders for temp files
-temp_dir=$temp_dir/$sample_name
+temp_dir_s=$temp_dir/$sample_name
 mkdir -p $temp_dir
 
 #run rsem to calculate the expression levels
 if [ $run_rsem -eq 1 ]; then
-  rsem-calculate-expression --num-threads 8 --temporary-folder $temp_dir \
+  rsem-calculate-expression --num-threads 8 --temporary-folder $temp_dir_s \
     --fragment-length-min 50
     --fragment-length-max 500
     --fragment-length-mean 200
@@ -81,7 +81,8 @@ if [ $run_rsem -eq 1 ]; then
     --output-genome-bam #output bam file as genomic, not transcript coordinates
     --seed 12345 #set seed for reproducibility of rng
     --ci-memory 30000
-    --paired-end $sample_dir/unmapped.1.fastq $sample_dir/unmapped.2.fastq \
+    --paired-end $sample_dir/$sample_name.trimmed.1.fastq \
+                 $sample_dir/$sample_name.trimmed.2.fastq \
     $rsem_ref $sample_name >& $log_files/$sample_name.rsem
 fi
 
@@ -92,6 +93,6 @@ fi
 
 #delete the temp files
 if [ $clean -eq 1]: then
-  rm -rf $temp_dir
+  rm -rf $temp_dir_s
 fi
 echo 'Finished RSEM RNA-seq pipeline for: '$sample_name
