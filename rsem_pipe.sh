@@ -17,7 +17,7 @@ make_plots=1
 #3. delete unecessary files from temp_dir
 clean=0
 ##### specify RSEM parameters
-alginer="bowtie2"
+alginer="star"
 
 ##### specify folders and variables #####
 #set script dir
@@ -36,7 +36,7 @@ pbs_mapping_file=$pipe_dir/pbs_mapping_file.txt
 temp_dir=$base_dir/temp/
 
 ##### conditional loading of the required modules #####
-module load RSEM/1.2.29-foss-2015a
+module load RSEM/1.2.30-foss-2016a
 # conditional loading of modules based on aligner to be used by RSEM
 if [ $aligner == "bowtie" ]; then
   module load Bowtie/1.1.2-foss-2015b
@@ -46,7 +46,7 @@ if [ $aligner == "bowtie2" ]; then
 fi
 #TODO: --star not yet supported? if so add star mapping command
 if [ $aligner == "star" ]; then
-  module load STAR/2.5.1b-goolf-1.4.10
+  module load rna-star/2.5.2a-foss-2016a
 fi
 if [ $make_plots -eq 1 ]; then
   module load R/3.2.3-foss-2016a
@@ -69,7 +69,7 @@ cd $sample_dir/rsem/
 
 #folders for temp files
 temp_dir_s=$temp_dir/$sample_name
-mkdir -p $temp_dir
+mkdir -p $temp_dir_s
 
 #run rsem to calculate the expression levels
 if [ $run_rsem -eq 1 ]; then
