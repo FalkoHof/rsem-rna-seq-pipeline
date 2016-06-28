@@ -1,7 +1,7 @@
 #!/bin/bash
 #PBS -P rnaseq_nod
 #PBS -N rsem-pipe
-#PBS -J 1-12
+#PBS -J 1-5
 #PBS -j oe
 #PBS -q workq
 #PBS -o /lustre/scratch/users/falko.hofmann/log/160628_rsem-rna/160628_rsem-rna_^array_index^_mapping.log
@@ -28,8 +28,8 @@ base_dir=/lustre/scratch/users/$USER/rna_seq
 log_files=$base_dir/logs
 #folder for rsem reference
 rsem_ref_dir=/lustre/scratch/users/falko.hofmann/indices/rsem/$aligner/nod_v01
- #add folder basename as prefix (follows convention from rsem_make_reference)
-rsem_ref=$rsem_ref_dir/basename(rsem_ref_dir)
+#add folder basename as prefix (follows convention from rsem_make_reference)
+rsem_ref=$rsem_ref_dir/$(basename $rsem_ref_dir)
 #location of the mapping file for the array job
 pbs_mapping_file=$pipe_dir/pbs_mapping_file.txt
 #super folder of the temp dir, script will create subfolders with $sample_name
@@ -44,13 +44,11 @@ fi
 if [ $aligner == "bowtie2" ]; then
   module load Bowtie2/2.2.7-foss-2015b
 fi
-#TODO: --star not yet supported? if so add star mapping command
 if [ $aligner == "star" ]; then
   module load rna-star/2.5.2a-foss-2016a
 fi
 if [ $make_plots -eq 1 ]; then
   module load R/3.2.3-foss-2016a
-
 fi
 ##### Obtain Parameters from mapping file using $PBS_ARRAY_INDEX as line number
 input_mapper=`sed -n "${PBS_ARRAY_INDEX} p" $pbs_mapping_file` #read mapping file
