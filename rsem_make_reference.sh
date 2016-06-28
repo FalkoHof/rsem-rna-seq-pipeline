@@ -9,10 +9,11 @@
 
 # === begin ENVIRONMENT SETUP ===
 ##### specify folders and variables #####
-aligner="star"
+aligner="bowtie2"
 annotation_file=/lustre/scratch/users/$USER/Ath_annotations/nod_v01/Arabidopsis_thaliana.TAIR10.30.nod_v01.gtf
 fasta_file=/lustre/scratch/users/$USER/indices/fasta/Col_mS.fa
 out_dir=/lustre/scratch/users/falko.hofmann/indices/rsem/$aligner/nod_v01
+prefix=basename(out_dir)
 
 ##### load required modules #####
 module load RSEM/1.2.29-foss-2015a
@@ -24,7 +25,7 @@ fi
 if [ $aligner == "bowtie2" ]; then
   module load Bowtie2/2.2.7-foss-2015b
 fi
-#TODO:star not yet supported? if so add star mapping command in rsem_pipe
+#TODO:star not yet supported. It seems some GCC libaries are misssing.
 if [ $aligner == "star" ]; then
   module load STAR/2.5.1b-goolf-1.4.10
 fi
@@ -40,6 +41,6 @@ echo 'Aligner to be used: ' $aligner
 mkdir -p $out_dir
 
 rsem-prepare-reference --num-threads 8 --gtf $annotation_file --$aligner \
-  $fasta_file $out_dir
+  $fasta_file $out_dir/$prefix
 
 echo 'Building rsem reference... - Done'

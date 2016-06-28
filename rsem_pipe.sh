@@ -4,7 +4,7 @@
 #PBS -J 1-12
 #PBS -j oe
 #PBS -q workq
-#PBS -o /lustre/scratch/users/falko.hofmann/log/160615_rsem-rna/160615_rsem-rna_^array_index^_mapping.log
+#PBS -o /lustre/scratch/users/falko.hofmann/log/160628_rsem-rna/160628_rsem-rna_^array_index^_mapping.log
 #PBS -l walltime=24:00:00
 #PBS -l select=1:ncpus=8:mem=32gb
 
@@ -27,9 +27,11 @@ base_dir=/lustre/scratch/users/$USER/rna_seq
 #folder for aligment logs
 log_files=$base_dir/logs
 #folder for rsem reference
-rsem_ref=/lustre/scratch/users/falko.hofmann/indices/rsem/
+rsem_ref_dir=/lustre/scratch/users/falko.hofmann/indices/rsem/$aligner/nod_v01
+ #add folder basename as prefix (follows convention from rsem_make_reference)
+rsem_ref=$rsem_ref_dir/basename(rsem_ref_dir)
 #location of the mapping file for the array job
-pbs_mapping_file=
+pbs_mapping_file=$pipe_dir/pbs_mapping_file.txt
 #super folder of the temp dir, script will create subfolders with $sample_name
 temp_dir=$base_dir/temp/
 
