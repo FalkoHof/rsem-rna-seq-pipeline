@@ -21,7 +21,7 @@ alginer="star"
 
 ##### specify folders and variables #####
 #set script dir
-pipe_dir=/lustre/scratch/users/$USER/pipes/rsem-rna-seq-pipeline
+pipe_dir=/lustre/scratch/users/$USER/pipelines/rsem-rna-seq-pipeline
 #set ouput base dir
 base_dir=/lustre/scratch/users/$USER/rna_seq
 #folder for aligment logs
