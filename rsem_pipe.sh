@@ -17,7 +17,7 @@ make_plots=1
 #3. delete unecessary files from temp_dir
 clean=0
 ##### specify RSEM parameters
-alginer="star"
+aligner="star"
 
 ##### specify folders and variables #####
 #set script dir
@@ -61,6 +61,9 @@ echo 'Rsem reference: ' $rsem_ref
 echo 'Aligner to be used: ' $aligner
 echo 'Mapping file: ' $pbs_mapping_file
 
+#make log folder
+mkdir -p $log_files
+
 #make output folder
 mkdir $sample_dir/rsem/
 cd $sample_dir/rsem/
@@ -72,6 +75,7 @@ mkdir -p $temp_dir_s
 #run rsem to calculate the expression levels
 if [ $run_rsem -eq 1 ]; then
   rsem-calculate-expression --num-threads 8 --temporary-folder $temp_dir_s \
+    --$aligner
     --fragment-length-min 50
     --fragment-length-max 500
     --fragment-length-mean 200
@@ -79,8 +83,7 @@ if [ $run_rsem -eq 1 ]; then
     --output-genome-bam #output bam file as genomic, not transcript coordinates
     --seed 12345 #set seed for reproducibility of rng
     --ci-memory 30000
-    --paired-end $sample_dir/$sample_name.trimmed.1.fastq \
-                 $sample_dir/$sample_name.trimmed.2.fastq \
+    --paired-end $sample_dir/$sample_name".trimmed.1.fastq" $sample_dir/$sample_name".trimmed.2.fastq" \
     $rsem_ref $sample_name >& $log_files/$sample_name.rsem
 fi
 
