@@ -7,7 +7,8 @@ To get the scripts run in your folder of choice:
 ```
 git clone https://gitlab.com/nodine-lab/rsem-rna-seq-pipeline.git
 ```
-This pipeline contains a collection of three scripts:
+This pipeline contains a collection of three scripts that should be run in the
+following order:
 1. rsem_make_reference.sh -  a script to build an rsem index
 2. make_pbs_mapping_table.sh - a script for creating a mapping table to tell
    rsem_pipe.sh which files/folders should be processed
@@ -62,3 +63,21 @@ This pipeline contains a collection of three scripts:
   make_pbs_mapping_table.sh before. Should be submitted as pbs job via
   ```qsub rsem_pipe.sh```.
 - Variables that need personalization:
+  - flow control: set these variables to either 0 or 1. 1 means run this part of
+    the script 0 means dont run it.
+    - run_rsem: run rsem-calculate-expression to quantify the input (Default: 1).
+    - make_plot: run rsem-plot-model to ouput diagnostic pdf (Default: 1).
+    - clean: delete all temporary files (Default: 0).
+  - aligner: specify the aligner that should be used.
+    accepted input is: bowtie, bowtie2, star.
+    Pick the same one you used to build your rsem reference via the
+    rsem_make_reference.sh script.
+  - rsem_ref_dir: specify the path of the rsem reference that was build via
+    the rsem_make_reference.sh script.
+  - pipe_dir: specify here the folder in which the pipeline scripts are located
+  - base_dir: specify here a super folder in which the folders log_files and
+    temp_dir will be created
+  - log_files: folder where rsem stdout will be written to for logging purposes
+  - pbs_mapping_file: specify here the location of the mapping file generated
+    via make_pbs_mapping_table.sh (Default: $pipe_dir/pbs_mapping_file.txt)
+  - temp_dir: temp folder path (Default: $base_dir/temp/)
