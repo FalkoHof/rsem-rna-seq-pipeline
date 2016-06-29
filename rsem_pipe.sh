@@ -17,11 +17,10 @@ make_plots=1
 #3. delete unecessary files from temp_dir
 clean=0
 ##### specify RSEM parameters
-alginer="star"
-
+aligner="star"
 ##### specify folders and variables #####
 #set script dir
-pipe_dir=/lustre/scratch/users/$USER/pipes/rsem-rna-seq-pipeline
+pipe_dir=/lustre/scratch/users/$USER/pipelines/rsem-rna-seq-pipeline
 #set ouput base dir
 base_dir=/lustre/scratch/users/$USER/rna_seq
 #folder for aligment logs
@@ -49,7 +48,6 @@ if [ $aligner == "star" ]; then
 fi
 if [ $make_plots -eq 1 ]; then
   module load R/3.2.3-foss-2016a
-
 fi
 ##### Obtain Parameters from mapping file using $PBS_ARRAY_INDEX as line number
 input_mapper=`sed -n "${PBS_ARRAY_INDEX} p" $pbs_mapping_file` #read mapping file
@@ -63,7 +61,7 @@ echo 'Aligner to be used: ' $aligner
 echo 'Mapping file: ' $pbs_mapping_file
 
 #make output folder
-mkdir $sample_dir/rsem/
+mkdir -p $sample_dir/rsem/
 cd $sample_dir/rsem/
 
 #folders for temp files
@@ -77,7 +75,7 @@ mkdir -p $temp_dir_s
 # --calc-ci calcutates 95% confidence interval of the expression values
 # --ci-memory 30000 set memory
 if [ $run_rsem -eq 1 ]; then
-  rsem-calculate-expression --$aligner--num-threads 8 \
+  rsem-calculate-expression --$aligner --num-threads 8 \
     --temporary-folder $temp_dir_s \
     --fragment-length-min 50 \
     --fragment-length-max 500 \
