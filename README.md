@@ -1,7 +1,17 @@
 # Nodine lab RSEM RNA-seq pipeline
-This repository contains a collections of scripts to map RNA-seq data via
-[STAR](https://github.com/alexdobin/STAR) and quantify the mapped reads via
+This repository contains a collections of scripts to map RNA-seq data via your
+aligner of choice and quantify the mapped reads via
 [RSEM](https://github.com/deweylab/RSEM).
+
+To get the scripts run in your folder of choice:
+```
+git clone https://gitlab.com/nodine-lab/rsem-rna-seq-pipeline.git
+```
+This pipeline contains a collection of three scripts:
+1. rsem_make_reference.sh
+2. make_pbs_mapping_table.sh
+3. rsem_pipe.sh
+
 
 ## rsem_make_reference.sh
 - Bash script to create an RSEM reference for a certain aligner with a certain
@@ -9,6 +19,8 @@ This repository contains a collections of scripts to map RNA-seq data via
 - Edit according to need and preferences (e.g. preferred aligner, annotation
   file format, fasta file location)
 - Should be submitted as pbs job via qsub
+- [STAR](https://github.com/alexdobin/STAR) is the recommended (and default)
+  aligner
 
 ## make_pbs_mapping_table.sh
 - Bash script to create a mapping file for pbs array jobs.
