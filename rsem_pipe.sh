@@ -84,7 +84,7 @@ if [ $run_rsem -eq 1 ]; then
     --output-genome-bam \
     --seed 12345 \
     --calc-ci \
-    --ci-memory 30000 \
+    --ci-memory 40000 \
     --paired-end $sample_dir/$sample_name.trimmed.1.fastq \
                  $sample_dir/$sample_name.trimmed.2.fastq \
     $rsem_ref $sample_name >& $log_files/$sample_name.rsem
