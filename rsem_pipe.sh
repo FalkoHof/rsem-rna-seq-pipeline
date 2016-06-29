@@ -44,7 +44,6 @@ fi
 if [ $aligner == "bowtie2" ]; then
   module load Bowtie2/2.2.7-foss-2015b
 fi
-#TODO: --star not yet supported? if so add star mapping command
 if [ $aligner == "star" ]; then
   module load rna-star/2.5.2a-foss-2016a
 fi
