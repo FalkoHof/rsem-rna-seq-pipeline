@@ -58,6 +58,7 @@ This pipeline contains a collection of three scripts:
 
 ## 3. rsem_pipe.sh
 - Bash script that runs RSEM with your aligner of choice (can be specified
-  in the script). Requires you to run ```rsem_make_reference.sh``` and ```make_pbs_mapping_table.sh```before. Should be submitted as pbs job via
-  ```qsub rsem_pipe.sh.
-  Modify parameters as needed.
+  in the script). Requires you to run rsem_make_reference.sh and
+  make_pbs_mapping_table.sh before. Should be submitted as pbs job via
+  ```qsub rsem_pipe.sh```.
+- Variables that need personalization:
