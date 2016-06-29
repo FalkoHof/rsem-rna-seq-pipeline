@@ -64,7 +64,7 @@ following order:
   ```qsub rsem_pipe.sh```.
 - Variables that need personalization:
   - flow control: set these variables to either 0 or 1. 1 means run this part of
-    the script 0 means dont run it.
+    the script 0 means don't run it.
     1. run_rsem: run rsem-calculate-expression to quantify the input (Default: 1).
     2. make_plot: run rsem-plot-model to ouput diagnostic pdf (Default: 1).
     3. clean: delete all temporary files (Default: 0).
