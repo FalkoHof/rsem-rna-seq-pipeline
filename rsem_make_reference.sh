@@ -12,7 +12,7 @@
 aligner="star"
 annotation_file=/lustre/scratch/users/$USER/Ath_annotations/nod_v01/Arabidopsis_thaliana.TAIR10.30.nod_v01.gtf
 fasta_file=/lustre/scratch/users/$USER/indices/fasta/Col_mS.fa
-out_dir=/lustre/scratch/users/falko.hofmann/indices/rsem/$aligner/nod_v01
+out_dir=/lustre/scratch/users/$USER/indices/rsem/$aligner/nod_v01
 prefix=`basename $out_dir`
 
 ##### load required modules #####

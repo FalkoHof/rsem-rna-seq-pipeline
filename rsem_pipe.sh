@@ -26,7 +26,7 @@ base_dir=/lustre/scratch/users/$USER/rna_seq
 #folder for aligment logs
 log_files=$base_dir/logs
 #folder for rsem reference
-rsem_ref_dir=/lustre/scratch/users/falko.hofmann/indices/rsem/$aligner/nod_v01
+rsem_ref_dir=/lustre/scratch/users/$USER/indices/rsem/$aligner/nod_v01
 #add folder basename as prefix (follows convention from rsem_make_reference)
 rsem_ref=$rsem_ref_dir/$(basename $rsem_ref_dir)
 #location of the mapping file for the array job
