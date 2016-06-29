@@ -15,7 +15,7 @@ run_rsem=1
 #2. make plots or not
 make_plots=1
 #3. delete unecessary files from temp_dir
-clean=0
+clean=1
 ##### specify RSEM parameters
 aligner="star"
 ##### specify folders and variables #####
@@ -92,11 +92,12 @@ fi
 
 #run the rsem plot function
 if [ $make_plots -eq 1 ]; then
-  rsem-plot-model $sample_dir $sample_dir/$sample_name.pdf
+  rsem-plot-model $sample_dir/rsem/ $sample_dir/$sample_name.pdf
 fi
 
 #delete the temp files
-if [ $clean -eq 1]: then
+if [ $clean -eq 1]; then
   rm -rf $temp_dir_s
 fi
+
 echo 'Finished RSEM RNA-seq pipeline for: '$sample_name
