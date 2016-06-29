@@ -31,6 +31,8 @@ $ git checkout some_fix
   [STAR](https://github.com/alexdobin/STAR) is the recommended (and default)
   aligner.
 - Variables that need personalization:
+  - #PBS -o: This path needs to be changed. Add here a path to where the log
+    file of the run should be stored.
   - aligner: specify the aligner that should be used.
     accepted input is: bowtie, bowtie2, star.
     You need to pick the same aligner later for the rsem_pipe.sh script
@@ -71,6 +73,9 @@ $ git checkout some_fix
   make_pbs_mapping_table.sh before. Should be submitted as pbs job via
   ```qsub rsem_pipe.sh```.
 - Variables that need personalization:
+  - #PBS -o: This path needs to be changed. Add here a path to where the log
+  file of the run should be stored. Use ^array_index^ if you are running a batch
+  job and want get the number of the batch job array for the file name. 
   - flow control: set these variables to either 0 or 1. 1 means run this part of
     the script 0 means don't run it.
        1. run_rsem: run rsem-calculate-expression to quantify the input (Default: 1).
