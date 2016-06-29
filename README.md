@@ -14,7 +14,7 @@ This pipeline contains a collection of three scripts:
 3. rsem_pipe.sh - the pipeline script to align and quantify rna seq data.
 
 
-## rsem_make_reference.sh
+## 1. rsem_make_reference.sh
 - A bash script to create an RSEM reference for a certain aligner with a certain
   annotation and fasta file. Edit according to need and preferences (e.g.
   preferred aligner, annotation file format, fasta file location). This script
@@ -37,11 +37,11 @@ This pipeline contains a collection of three scripts:
   - out_dir: specify here the folder where the rsem reference should be stored
     at. Defaults to: '/lustre/scratch/users/$USER/indices/rsem/$aligner/nod_v01'
 
-## make_pbs_mapping_table.sh
+## 2. make_pbs_mapping_table.sh
 - Bash script to create a mapping file for pbs array jobs. Should be run via the
   standard shell environment and needs an folder as command line argument.
   The script will list the subfolders and output a mapping of
-  <line number> <dir> to stdout. Pipe the output to a file and specifiy this
+  <line number> <dir> to stdout. Pipe the output to a file and specify this
   file in the rsem_pipe.sh script. The idea here is that you don't manually need
   to type in sample names when you want to submit a batch job. Just input the
   super folder of all your samples as command line argument.
@@ -56,8 +56,8 @@ This pipeline contains a collection of three scripts:
   (Cluster & linux is fine, for the Mac you need to install readlink e.g.
   via Homebrew, no idea where Cygwin stands on that)
 
-## rsem_pipe.sh
+## 3. rsem_pipe.sh
 - Bash script that runs RSEM with your aligner of choice (can be specified
-  in the script). Modify parameters as needed.
-- Requires you to run rsem_make_reference.sh and make_pbs_mapping_table.sh before
-- Should be submitted as pbs job via qsub
+  in the script). Requires you to run ```rsem_make_reference.sh``` and ```make_pbs_mapping_table.sh```before. Should be submitted as pbs job via
+  ```qsub rsem_pipe.sh.
+  Modify parameters as needed.
