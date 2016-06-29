@@ -71,6 +71,7 @@ $ git checkout some_fix
   ```shell
   1 /Some/Folder/RNA-seq/sample_x/
   2 /Some/Folder/RNA-seq/sample_y/
+  ...
   ```
 
 ## 3. rsem_pipe.sh
