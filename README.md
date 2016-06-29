@@ -66,6 +66,10 @@ $ git checkout some_fix
   Warning: only works on systems with gnu readlink installed.
   (Cluster & linux is fine, for the Mac you need to install readlink e.g.
   via Homebrew, no idea where Cygwin stands on that)
+- Alternatively the file can also be generated manually as e.g. shown below:
+  ```
+  1 /Some/Folder/RNA-seq/sample_x/
+  ```
 
 ## 3. rsem_pipe.sh
 - Bash script that runs RSEM with your aligner of choice (can be specified
