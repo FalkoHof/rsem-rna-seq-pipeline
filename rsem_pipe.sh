@@ -6,7 +6,7 @@
 #PBS -q workq
 #PBS -o /lustre/scratch/users/falko.hofmann/log/160628_rsem-rna/160628_rsem-rna_^array_index^_mapping.log
 #PBS -l walltime=24:00:00
-#PBS -l select=1:ncpus=8:mem=32gb
+#PBS -l select=1:ncpus=8:mem=48gb
 
 # === begin ENVIRONMENT SETUP ===
 ####set to 0 (false) or 1 (true) to let the repsective code block run
