@@ -29,7 +29,7 @@ log_files=$base_dir/logs
 #folder for rsem reference
 rsem_ref_dir=/lustre/scratch/users/falko.hofmann/indices/rsem/$aligner/nod_v01
  #add folder basename as prefix (follows convention from rsem_make_reference)
-rsem_ref=$rsem_ref_dir/basename(rsem_ref_dir)
+rsem_ref=$rsem_ref_dir/$basename(rsem_ref_dir)
 #location of the mapping file for the array job
 pbs_mapping_file=$pipe_dir/pbs_mapping_file.txt
 #super folder of the temp dir, script will create subfolders with $sample_name
