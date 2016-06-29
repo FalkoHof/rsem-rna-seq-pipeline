@@ -4,7 +4,7 @@ aligner of choice and quantify the mapped reads via
 [RSEM](https://github.com/deweylab/RSEM).
 
 To get the scripts run in your folder of choice:
-```bash
+```shell
 git clone https://gitlab.com/nodine-lab/rsem-rna-seq-pipeline.git
 ```
 This pipeline contains a collection of three scripts that should be run in the
@@ -18,7 +18,7 @@ If you want to hack around on the pipeline and create your own customized
 pipelines either [fork](https://help.github.com/articles/fork-a-repo/)
 the repository (prefered for customization) or create a seperate [branch](https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell)
 (prefered for hacking on bug fixes etc.).
-```bash
+```shell
 $ git branch some_fix
 $ git checkout some_fix
 ```
