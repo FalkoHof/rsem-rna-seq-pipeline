@@ -17,19 +17,19 @@ make_plots=1
 #3. delete unecessary files from temp_dir
 clean=0
 ##### specify RSEM parameters
-aligner="star"
+alginer="star"
 
 ##### specify folders and variables #####
 #set script dir
-pipe_dir=/lustre/scratch/users/$USER/pipelines/rsem-rna-seq-pipeline
+pipe_dir=/lustre/scratch/users/$USER/pipes/rsem-rna-seq-pipeline
 #set ouput base dir
 base_dir=/lustre/scratch/users/$USER/rna_seq
 #folder for aligment logs
 log_files=$base_dir/logs
 #folder for rsem reference
 rsem_ref_dir=/lustre/scratch/users/falko.hofmann/indices/rsem/$aligner/nod_v01
-#add folder basename as prefix (follows convention from rsem_make_reference)
-rsem_ref=$rsem_ref_dir/$(basename $rsem_ref_dir)
+ #add folder basename as prefix (follows convention from rsem_make_reference)
+rsem_ref=$rsem_ref_dir/basename(rsem_ref_dir)
 #location of the mapping file for the array job
 pbs_mapping_file=$pipe_dir/pbs_mapping_file.txt
 #super folder of the temp dir, script will create subfolders with $sample_name
@@ -44,11 +44,13 @@ fi
 if [ $aligner == "bowtie2" ]; then
   module load Bowtie2/2.2.7-foss-2015b
 fi
+#TODO: --star not yet supported? if so add star mapping command
 if [ $aligner == "star" ]; then
   module load rna-star/2.5.2a-foss-2016a
 fi
 if [ $make_plots -eq 1 ]; then
   module load R/3.2.3-foss-2016a
+
 fi
 ##### Obtain Parameters from mapping file using $PBS_ARRAY_INDEX as line number
 input_mapper=`sed -n "${PBS_ARRAY_INDEX} p" $pbs_mapping_file` #read mapping file
@@ -61,9 +63,6 @@ echo 'Rsem reference: ' $rsem_ref
 echo 'Aligner to be used: ' $aligner
 echo 'Mapping file: ' $pbs_mapping_file
 
-#make log folder
-mkdir -p $log_files
-
 #make output folder
 mkdir $sample_dir/rsem/
 cd $sample_dir/rsem/
@@ -72,18 +71,25 @@ cd $sample_dir/rsem/
 temp_dir_s=$temp_dir/$sample_name
 mkdir -p $temp_dir_s
 
-#run rsem to calculate the expression levels
+# run rsem to calculate the expression levels
+# --estimate-rspd: estimate read start position to check if the data has bias
+# --output-genome-bam: output bam file as genomic, not transcript coordinates
+# --seed 12345 set seed for reproducibility of rng
+# --calc-ci calcutates 95% confidence interval of the expression values
+# --ci-memory 30000 set memory
 if [ $run_rsem -eq 1 ]; then
-  rsem-calculate-expression --num-threads 8 --temporary-folder $temp_dir_s \
-    --$aligner
-    --fragment-length-min 50
-    --fragment-length-max 500
-    --fragment-length-mean 200
-    --estimate-rspd # estimate read start position to check if the data has bias
-    --output-genome-bam #output bam file as genomic, not transcript coordinates
-    --seed 12345 #set seed for reproducibility of rng
-    --ci-memory 30000
-    --paired-end $sample_dir/$sample_name".trimmed.1.fastq" $sample_dir/$sample_name".trimmed.2.fastq" \
+  rsem-calculate-expression --$aligner--num-threads 8 \
+    --temporary-folder $temp_dir_s \
+    --fragment-length-min 50 \
+    --fragment-length-max 500 \
+    --fragment-length-mean 120 \
+    --estimate-rspd \
+    --output-genome-bam \
+    --seed 12345 \
+    --calc-ci \
+    --ci-memory 30000 \
+    --paired-end $sample_dir/$sample_name.trimmed.1.fastq \
+                 $sample_dir/$sample_name.trimmed.2.fastq \
     $rsem_ref $sample_name >& $log_files/$sample_name.rsem
 fi
 
