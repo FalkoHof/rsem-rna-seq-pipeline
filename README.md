@@ -14,6 +14,14 @@ following order:
    rsem_pipe.sh which files/folders should be processed
 3. rsem_pipe.sh - the pipeline script to align and quantify rna seq data.
 
+If you want to hack around on the pipeline and create your own customized
+pipelines either [fork](https://help.github.com/articles/fork-a-repo/)
+the repository (prefered for customization) or create a seperate [branch](https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell)
+(prefered for hacking on bug fixes etc.).
+```
+$ git branch some_fix
+$ git checkout some_fix
+```
 
 ## 1. rsem_make_reference.sh
 - A bash script to create an RSEM reference for a certain aligner with a certain
