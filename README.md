@@ -18,7 +18,7 @@ This pipeline contains a collection of three scripts:
 - A bash script to create an RSEM reference for a certain aligner with a certain
   annotation and fasta file. Edit according to need and preferences (e.g.
   preferred aligner, annotation file format, fasta file location). This script
-  should be submitted as pbs job via qsub.
+  should be submitted as pbs job via ```qsub rsem_make_reference.sh``` .
   [STAR](https://github.com/alexdobin/STAR) is the recommended (and default)
   aligner.
 - Variables that need personalization:
