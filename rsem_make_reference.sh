@@ -10,9 +10,10 @@
 # === begin ENVIRONMENT SETUP ===
 ##### specify folders and variables #####
 aligner="star"
-annotation_file=/lustre/scratch/users/$USER/Ath_annotations/nod_v01/Arabidopsis_thaliana.TAIR10.30.nod_v01.gtf
+#annotation_file=/lustre/scratch/users/$USER/Ath_annotations/nod_v01/Arabidopsis_thaliana.TAIR10.30.nod_v01.gtf
+annotation_file=/lustre/scratch/users/$USER/Ath_annotations/nod_v01_split/Arabidopsis_thaliana.TAIR10.30.nod_v01.all_minus_te.gtf
 fasta_file=/lustre/scratch/users/$USER/indices/fasta/Col_mS.fa
-out_dir=/lustre/scratch/users/$USER/indices/rsem/$aligner/nod_v01
+out_dir=/lustre/scratch/users/$USER/indices/rsem/$aligner/nod_v01_split/all_minus_te
 prefix=`basename $out_dir`
 
 ##### load required modules #####

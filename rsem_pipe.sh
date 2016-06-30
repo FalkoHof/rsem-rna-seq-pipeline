@@ -26,7 +26,8 @@ base_dir=/lustre/scratch/users/$USER/rna_seq
 #folder for aligment logs
 log_files=$base_dir/logs
 #folder for rsem reference
-rsem_ref_dir=/lustre/scratch/users/$USER/indices/rsem/$aligner/nod_v01
+#rsem_ref_dir=/lustre/scratch/users/$USER/indices/rsem/$aligner/nod_v01
+rsem_ref_dir=/lustre/scratch/users/$USER/indices/rsem/$aligner/nod_v01_split/all_minus_te
 #add folder basename as prefix (follows convention from rsem_make_reference)
 rsem_ref=$rsem_ref_dir/$(basename $rsem_ref_dir)
 #location of the mapping file for the array job
@@ -61,8 +62,11 @@ echo 'Aligner to be used: ' $aligner
 echo 'Mapping file: ' $pbs_mapping_file
 
 #make output folder
-mkdir -p $sample_dir/rsem/
-cd $sample_dir/rsem/
+#mkdir -p $sample_dir/rsem/
+#cd $sample_dir/rsem/
+
+mkdir -p $sample_dir/rsem/all_minus_te
+cd $sample_dir/rsem/all_minus_te
 
 #folders for temp files
 temp_dir_s=$temp_dir/$sample_name
@@ -93,7 +97,8 @@ fi
 
 #run the rsem plot function
 if [ $make_plots -eq 1 ]; then
-  rsem-plot-model $sample_dir/rsem/$sample_name $sample_dir/rsem/$sample_name.pdf
+  rsem-plot-model $sample_dir/rsem/all_minus_te/$sample_name \
+    $sample_dir/rsem/all_minus_te/$sample_name.pdf
 fi
 
 #delete the temp files
