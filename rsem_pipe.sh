@@ -92,7 +92,7 @@ fi
 
 #run the rsem plot function
 if [ $make_plots -eq 1 ]; then
-  rsem-plot-model $sample_dir/rsem/ $sample_dir/$sample_name.pdf
+  rsem-plot-model $sample_dir/rsem/$sample_name $sample_dir/rsem/$sample_name.pdf
 fi
 
 #delete the temp files
