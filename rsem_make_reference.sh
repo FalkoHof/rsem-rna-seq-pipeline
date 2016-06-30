@@ -37,7 +37,7 @@ echo 'Output directory: ' $out_dir
 echo 'Aligner to be used: ' $aligner
 
 mkdir -p $out_dir
-
+#TODO: change implementation, so that file extention is automatically recognized
 rsem-prepare-reference --num-threads 8 --gtf $annotation_file --$aligner \
   $fasta_file $out_dir/$prefix
 

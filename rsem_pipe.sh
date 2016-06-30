@@ -74,6 +74,7 @@ mkdir -p $temp_dir_s
 # --seed 12345 set seed for reproducibility of rng
 # --calc-ci calcutates 95% confidence interval of the expression values
 # --ci-memory 30000 set memory
+#TODO: change implementation, so that file extention is automatically recognized
 if [ $run_rsem -eq 1 ]; then
   rsem-calculate-expression --$aligner --num-threads 8 \
     --temporary-folder $temp_dir_s \
