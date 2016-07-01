@@ -1,7 +1,7 @@
 #!/bin/bash
 #PBS -P rnaseq_nod
 #PBS -N rsem-pipe
-#PBS -J 1-5
+#PBS -J 1-65
 #PBS -j oe
 #PBS -q workq
 #PBS -o /lustre/scratch/users/falko.hofmann/log/160628_rsem-rna/160628_rsem-rna_^array_index^_mapping.log
@@ -18,6 +18,8 @@ make_plots=1
 clean=1
 ##### specify RSEM parameters
 aligner="star"
+seq_mode="PE"
+file_type="bam"
 ##### specify folders and variables #####
 #set script dir
 pipe_dir=/lustre/scratch/users/$USER/pipelines/rsem-rna-seq-pipeline
@@ -74,13 +76,64 @@ mkdir -p $temp_dir_s
 # --seed 12345 set seed for reproducibility of rng
 # --calc-ci calcutates 95% confidence interval of the expression values
 # --ci-memory 30000 set memory
-#TODO: change implementation, so that file extention is automatically recognized
+
 if [ $run_rsem -eq 1 ]; then
+
+  rsem_opts=""
+
+  if [ $file_type == "bam" ]
+  then
+    #TODO: include filter to avoid grepping storted.bam files
+    f=($(ls $sample_dir | grep -e ".bam")) # get all files with .bam extention
+    file_number=${#f[@]} # get the length of the array
+
+    if [ "$file_number" -gt "1" ]
+    then
+      echo "Only one bam file per sample folder allowed! Aborting." 1>&2
+      exit 1
+    else
+      #TODO: load samtools module
+      samtools sort -n -m 4G -@ 8 -o $sample_dir/$(basename $f .bam).sorted.bam \
+        $sample_dir/$f
+
+
+      rsem_opts=$rsem_opts"--bam" $sample_dir/
+
+    fi
+
+    #TODO: add file globbing and sorting
+  elif [ $file_type == "fastq"]
+    rsem_opts=$rsem_opts
+
+
+    f=($(ls $sample_dir | grep -e ".fq\|.fastq"))
+    file_number=${#f[@]}
+
+
+
+  else
+    echo "Unsupported file type selected! Aborting." 1>&2
+    exit 1
+  fi
+
+
+
+
+  if [ $seq_mode == "PE" ]
+  then
+    echo "Running rsem in paired end mode.."
+    rsem_opts=$rsem_opts" --paired-end"
+  elif [ $seq_mode == "SE" ]
+    echo "Running rsem in paired end mode.."
+  else
+    echo "Wrong parameters selected for seq_mode! Aborting." 1>&2
+    exit 1
+  fi
+
+
   rsem-calculate-expression --$aligner --num-threads 8 \
     --temporary-folder $temp_dir_s \
-    --fragment-length-min 50 \
-    --fragment-length-max 500 \
-    --fragment-length-mean 120 \
+    --append-names \
     --estimate-rspd \
     --output-genome-bam \
     --seed 12345 \
