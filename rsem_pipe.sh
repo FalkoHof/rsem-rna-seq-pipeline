@@ -13,9 +13,9 @@
 #1. run rsem
 run_rsem=1
 #2. make plots or not
-make_plots=1
+make_plots=0
 #3. delete unecessary files from temp_dir
-clean=1
+clean=0
 ##### specify RSEM parameters
 aligner="star"
 seq_mode="PE"
@@ -57,10 +57,25 @@ names_mapped=($input_mapper)
 sample_dir=${names_mapped[1]} # get the sample dir
 sample_name=`basename $sample_dir` #get the base name of the dir as sample name
 
+#print some output for logging
+echo '#########################################################################'
 echo 'Starting RSEM RNA-seq pipeline for: '$sample_name
 echo 'Rsem reference: ' $rsem_ref
 echo 'Aligner to be used: ' $aligner
 echo 'Mapping file: ' $pbs_mapping_file
+echo 'Selected file type: ' $file_type
+echo 'Selected sequencing mode: ' $seq_mode
+echo '#########################################################################'
+
+#some paramter checking
+if [ $seq_mode != "PE" ] || [ $seq_mode != "SE" ]; then
+  echo "Wrong parameters selected for seq_mode! Aborting." 1>&2
+  exit 1
+fi
+if [ $file_type != "bam" ] || [ $file_type != "fastq" ]; then
+  echo "Wrong parameters selected for file_type! Aborting." 1>&2
+  exit 1
+fi
 
 #make output folder
 mkdir -p $sample_dir/rsem/
@@ -77,71 +92,66 @@ mkdir -p $temp_dir_s
 # --calc-ci calcutates 95% confidence interval of the expression values
 # --ci-memory 30000 set memory
 
+#some function to check the number of files present
+function get_files {
+  # get all files at a location with a specific extention
+  f=($(ls $1 | grep -e "$2"))
+  echo $f
+}
+
 if [ $run_rsem -eq 1 ]; then
-
+  #initalize variable
   rsem_opts=""
-
-  if [ $file_type == "bam" ]
-  then
-    #TODO: include filter to avoid grepping storted.bam files
-    f=($(ls $sample_dir | grep -e ".bam")) # get all files with .bam extention
-    file_number=${#f[@]} # get the length of the array
-
-    if [ "$file_number" -gt "1" ]
-    then
-      echo "Only one bam file per sample folder allowed! Aborting." 1>&2
-      exit 1
-    else
-      #TODO: load samtools module
-      samtools sort -n -m 4G -@ 8 -o $sample_dir/$(basename $f .bam).sorted.bam \
-        $sample_dir/$f
-
-
-      rsem_opts=$rsem_opts"--bam" $sample_dir/
-
-    fi
-
-    #TODO: add file globbing and sorting
-  elif [ $file_type == "fastq"]
-    rsem_opts=$rsem_opts
-
-
-    f=($(ls $sample_dir | grep -e ".fq\|.fastq"))
+  #add paired-end flag if data is PE
+  if [ $seq_mode = "PE" ]; then
+    rsem_opts=$rsem_opts"--paired-end "
+  fi
+  if [ $file_type = "bam" ]; then
+    f=$(get_files $sample_dir ".bam")
+    # get lenght of the array
     file_number=${#f[@]}
-
-
-
+    if [ "$file_number" = "1" ]; then
+      rsem_opts=$rsem_opts"--bam $sample_dir/$f"
+    else
+      echo "Only one bam file per sample folder allowed! Aborting."\
+           "Files present: $file_number" 1>&2
+      exit 1
+    fi
+  elif [ $file_type = "fastq"]; then
+    rsem_opts=$rsem_opts
+    f=$(get_files $sample_dir ".fq\|.fastq")
+    file_number=${#f[@]}
+    #some error handling. Check if only the expected number of fq files is there
+    if [ "$file_number" -eq "1" ]  && [ "$seq_mode" = "SE" ]; then
+      rsem_opts=$rsem_opts"$sample_dir/$f"
+    elif [ "$file_number" -eq "2" ]  && [ "$seq_mode" = "PE" ]; then
+      rsem_opts=$rsem_opts"$sample_dir/${f[0]} $sample_dir/${f[1]}"
+    else
+      echo "Wrong number of fastq files in sample folder! Aborting."\
+           "Files present: $file_number" 1>&2
+      exit 1
+    fi
   else
     echo "Unsupported file type selected! Aborting." 1>&2
     exit 1
   fi
 
-
-
-
-  if [ $seq_mode == "PE" ]
-  then
-    echo "Running rsem in paired end mode.."
-    rsem_opts=$rsem_opts" --paired-end"
-  elif [ $seq_mode == "SE" ]
-    echo "Running rsem in paired end mode.."
-  else
-    echo "Wrong parameters selected for seq_mode! Aborting." 1>&2
-    exit 1
-  fi
-
-
-  rsem-calculate-expression --$aligner --num-threads 8 \
-    --temporary-folder $temp_dir_s \
-    --append-names \
-    --estimate-rspd \
-    --output-genome-bam \
-    --seed 12345 \
-    --calc-ci \
-    --ci-memory 40000 \
-    --paired-end $sample_dir/$sample_name.trimmed.1.fastq \
-                 $sample_dir/$sample_name.trimmed.2.fastq \
-    $rsem_ref $sample_name >& $log_files/$sample_name.rsem
+rsem_command=rsem-calculate-expression
+               --$aligner \
+               --num-threads 8 \
+               --temporary-folder $temp_dir_s \
+               --append-names \
+               --estimate-rspd \
+               --output-genome-bam \
+               --seed 12345 \
+               --calc-ci \
+               --ci-memory 40000 \
+               $rsem_opts \
+               $rsem_ref \
+               $sample_name
+#rsem command that should be run
+echo $rsem_command >& $log_files/$sample_name.rsem
+#$rsem_command >& $log_files/$sample_name.rsem
 fi
 
 #run the rsem plot function
