@@ -136,17 +136,18 @@ if [ $run_rsem -eq 1 ]; then
     exit 1
   fi
 
-rsem_params="--num-threads 8 --$aligner "\
-            "--temporary-folder $temp_dir_s "\
-            "--append-names "\
-            "--estimate-rspd "\
-            "--output-genome-bam "\
-            "--seed 12345 "\
-            "--calc-ci "\
-            "--ci-memory 40000 "\
-            "$rsem_opts "\
-            "$rsem_ref "\
-            "$sample_name"
+rsem_params="--$aligner \
+--num-threads 8 \
+--temporary-folder $temp_dir_s \
+--append-names \
+--estimate-rspd \
+--output-genome-bam \
+--seed 12345 \
+--calc-ci \
+--ci-memory 40000 \
+$rsem_opts \
+$rsem_ref \
+$sample_name"
 #rsem command that should be run
 echo "rsem-calculate-expression arguments: "\
      "$rsem_params >& $log_files/$sample_name.rsem"
