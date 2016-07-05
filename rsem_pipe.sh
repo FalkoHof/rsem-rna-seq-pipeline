@@ -1,7 +1,7 @@
 #!/bin/bash
 #PBS -P rnaseq_nod
 #PBS -N rsem-pipe
-#PBS -J 1-5
+#PBS -J 1-65
 #PBS -j oe
 #PBS -q workq
 #PBS -o /lustre/scratch/users/falko.hofmann/log/160628_rsem-rna/160628_rsem-rna_^array_index^_mapping.log
@@ -136,19 +136,17 @@ if [ $run_rsem -eq 1 ]; then
     exit 1
   fi
 
-rsem_command=rsem-calculate-expression
-               --$aligner \
-               --num-threads 8 \
-               --temporary-folder $temp_dir_s \
-               --append-names \
-               --estimate-rspd \
-               --output-genome-bam \
-               --seed 12345 \
-               --calc-ci \
-               --ci-memory 40000 \
-               $rsem_opts \
-               $rsem_ref \
-               $sample_name
+rsem_command="rsem-calculate-expression --num-threads 8 --$aligner "\
+               "--temporary-folder $temp_dir_s "\
+               "--append-names" \
+               "--estimate-rspd" \
+               "--output-genome-bam" \
+               "--seed 12345" \
+               "--calc-ci" \
+               "--ci-memory 40000" \
+               "$rsem_opts" \
+               "$rsem_ref" \
+               "$sample_name"
 #rsem command that should be run
 echo $rsem_command >& $log_files/$sample_name.rsem
 $rsem_command >& $log_files/$sample_name.rsem
@@ -160,7 +158,7 @@ if [ $make_plots -eq 1 ]; then
 fi
 
 #delete the temp files
-if [ $clean -eq 1]; then
+if [ $clean -eq 1 ]; then
   rm -rf $temp_dir_s
 fi
 
