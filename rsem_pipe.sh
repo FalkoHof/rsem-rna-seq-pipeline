@@ -150,7 +150,7 @@ $rsem_ref \
 $sample_name"
 #rsem command that should be run
 echo "rsem-calculate-expression $rsem_params >& $log_files/$sample_name.rsem"
-rsem-calculate-expression "$rsem_params >& $log_files/$sample_name.rsem"
+rsem-calculate-expression" $rsem_params >& $log_files/$sample_name.rsem"
 fi
 
 #run the rsem plot function
