@@ -136,17 +136,17 @@ if [ $run_rsem -eq 1 ]; then
     exit 1
   fi
 
-rsem_command="rsem-calculate-expression --num-threads 8 --$aligner "\
-               "--temporary-folder $temp_dir_s "\
-               "--append-names " \
-               "--estimate-rspd " \
-               "--output-genome-bam " \
-               "--seed 12345 " \
-               "--calc-ci " \
-               "--ci-memory 40000 " \
-               "$rsem_opts " \
-               "$rsem_ref " \
-               "$sample_name"
+rsem_command=rsem-calculate-expression --num-threads 8 --$aligner\
+               --temporary-folder $temp_dir_s \
+               --append-names \
+               --estimate-rspd \
+               --output-genome-bam \
+               --seed 12345 \
+               --calc-ci \
+               --ci-memory 40000 \
+               $rsem_opts \
+               $rsem_ref \
+               $sample_name
 #rsem command that should be run
 echo $rsem_command >& $log_files/$sample_name.rsem
 $rsem_command >& $log_files/$sample_name.rsem
