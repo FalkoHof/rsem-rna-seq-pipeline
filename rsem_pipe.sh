@@ -106,7 +106,7 @@ if [ $run_rsem -eq 1 ]; then
   if [ $seq_mode = "PE" ]; then
     rsem_opts=$rsem_opts"--paired-end "
   fi
-  if [ $file_type = "bam" ]; then
+  if [ "$file_type" = "bam" ]; then
     f=$(get_files $sample_dir ".bam")
     # get lenght of the array
     file_number=${#f[@]}
@@ -117,7 +117,7 @@ if [ $run_rsem -eq 1 ]; then
            "Files present: $file_number" 1>&2
       exit 1
     fi
-  elif [ $file_type = "fastq"]; then
+  elif [ "$file_type" = "fastq" ]; then
     rsem_opts=$rsem_opts
     f=$(get_files $sample_dir ".fq\|.fastq")
     file_number=${#f[@]}
