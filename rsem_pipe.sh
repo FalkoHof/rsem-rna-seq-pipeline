@@ -34,7 +34,7 @@ rsem_ref=$rsem_ref_dir/$(basename $rsem_ref_dir)
 #location of the mapping file for the array job
 pbs_mapping_file=$pipe_dir/pbs_mapping_file.txt
 #super folder of the temp dir, script will create subfolders with $sample_name
-temp_dir=$base_dir/temp/
+temp_dir=$base_dir/temp
 
 ##### conditional loading of the required modules #####
 module load RSEM/1.2.30-foss-2016a
@@ -72,7 +72,7 @@ if [ $seq_mode != "PE" ] && [ $seq_mode != "SE" ]; then
   echo "Wrong parameters selected for seq_mode! Aborting." 1>&2
   exit 1
 fi
-if [ $file_type != "bam" ] || [ $file_type != "fastq" ]; then
+if [ $file_type != "bam" ] && [ $file_type != "fastq" ]; then
   echo "Wrong parameters selected for file_type! Aborting." 1>&2
   exit 1
 fi
