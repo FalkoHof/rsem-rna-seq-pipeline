@@ -1,7 +1,7 @@
 #!/bin/bash
 #PBS -P rnaseq_nod
 #PBS -N rsem-pipe
-#PBS -J 1-65
+#PBS -J 1-5
 #PBS -j oe
 #PBS -q workq
 #PBS -o /lustre/scratch/users/falko.hofmann/log/160628_rsem-rna/160628_rsem-rna_^array_index^_mapping.log
@@ -68,7 +68,7 @@ echo 'Selected sequencing mode: ' $seq_mode
 echo '#########################################################################'
 
 #some paramter checking
-if [ $seq_mode != "PE" ] || [ $seq_mode != "SE" ]; then
+if [ $seq_mode != "PE" ] && [ $seq_mode != "SE" ]; then
   echo "Wrong parameters selected for seq_mode! Aborting." 1>&2
   exit 1
 fi
@@ -151,7 +151,7 @@ rsem_command=rsem-calculate-expression
                $sample_name
 #rsem command that should be run
 echo $rsem_command >& $log_files/$sample_name.rsem
-#$rsem_command >& $log_files/$sample_name.rsem
+$rsem_command >& $log_files/$sample_name.rsem
 fi
 
 #run the rsem plot function
