@@ -1,10 +1,10 @@
 #!/bin/bash
 #PBS -P rnaseq_nod
 #PBS -N rsem-pipe
-#PBS -J 1-65
+#PBS -J 1-2
 #PBS -j oe
 #PBS -q workq
-#PBS -o /lustre/scratch/users/falko.hofmann/log/160628_rsem-rna/160628_rsem-rna_^array_index^_mapping.log
+#PBS -o /lustre/scratch/users/falko.hofmann/log/160705_rsem/rsem-rna_^array_index^_mapping.log
 #PBS -l walltime=24:00:00
 #PBS -l select=1:ncpus=8:mem=48gb
 
@@ -138,14 +138,14 @@ if [ $run_rsem -eq 1 ]; then
 
 rsem_command="rsem-calculate-expression --num-threads 8 --$aligner "\
                "--temporary-folder $temp_dir_s "\
-               "--append-names" \
-               "--estimate-rspd" \
-               "--output-genome-bam" \
-               "--seed 12345" \
-               "--calc-ci" \
-               "--ci-memory 40000" \
-               "$rsem_opts" \
-               "$rsem_ref" \
+               "--append-names " \
+               "--estimate-rspd " \
+               "--output-genome-bam " \
+               "--seed 12345 " \
+               "--calc-ci " \
+               "--ci-memory 40000 " \
+               "$rsem_opts " \
+               "$rsem_ref " \
                "$sample_name"
 #rsem command that should be run
 echo $rsem_command >& $log_files/$sample_name.rsem
