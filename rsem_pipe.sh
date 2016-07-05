@@ -92,13 +92,6 @@ mkdir -p $temp_dir_s
 # --calc-ci calcutates 95% confidence interval of the expression values
 # --ci-memory 30000 set memory
 
-#some function to check the number of files present
-function get_files {
-  # get all files at a location with a specific extention
-  f=($(ls "$1" | grep -e "$2"))
-  echo $f
-}
-
 if [ $run_rsem -eq 1 ]; then
   #initalize variable
   rsem_opts=""
@@ -107,9 +100,9 @@ if [ $run_rsem -eq 1 ]; then
     rsem_opts=$rsem_opts"--paired-end "
   fi
   if [ "$file_type" = "bam" ]; then
+    #get files with .bam extention
     f=($(ls  $sample_dir| grep -e ".bam"))
-    #f=$(get_files $sample_dir bam)
-    # get lenght of the array
+    # get length of the array
     file_number=${#f[@]}
     if [ "$file_number" = "1" ]; then
       rsem_opts=$rsem_opts"--bam $sample_dir/$f"
@@ -120,8 +113,8 @@ if [ $run_rsem -eq 1 ]; then
     fi
   elif [ "$file_type" = "fastq" ]; then
     rsem_opts=$rsem_opts
+    #get files with .fq or .fastq extention
     f=($(ls  $sample_dir| grep -e ".fq\|.fastq"))
-    #f=$(get_files $sample_dir .fq\|.fastq)
     file_number=${#f[@]}
     #some error handling. Check if only the expected number of fq files is there
     if [ $file_number -eq 1 ]  && [ "$seq_mode" = "SE" ]; then
