@@ -19,7 +19,7 @@ clean=0
 ##### specify RSEM parameters
 aligner="star"
 seq_mode="PE"
-file_type="bam"
+file_type="fastq"
 ##### specify folders and variables #####
 #set script dir
 pipe_dir=/lustre/scratch/users/$USER/pipelines/rsem-rna-seq-pipeline
