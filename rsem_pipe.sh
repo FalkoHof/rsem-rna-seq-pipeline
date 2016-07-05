@@ -149,8 +149,7 @@ $rsem_opts \
 $rsem_ref \
 $sample_name"
 #rsem command that should be run
-echo "rsem-calculate-expression arguments: "\
-     "$rsem_params >& $log_files/$sample_name.rsem"
+echo "rsem-calculate-expression $rsem_params >& $log_files/$sample_name.rsem"
 rsem-calculate-expression $rsem_params >& $log_files/$sample_name.rsem
 fi
 
