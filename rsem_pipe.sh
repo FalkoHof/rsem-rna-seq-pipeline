@@ -20,6 +20,7 @@ clean=0
 aligner="star"
 seq_mode="PE"
 file_type="fastq"
+threads=8 #set this to the number of available cores
 ##### specify folders and variables #####
 #set script dir
 pipe_dir=/lustre/scratch/users/$USER/pipelines/rsem-rna-seq-pipeline
@@ -36,7 +37,8 @@ temp_dir=$base_dir/temp
 
 #####loading of the required modules #####
 module load RSEM/1.2.30-foss-2016a
-
+module load BEDTools/v2.17.0-goolf-1.4.10
+module load SAMtools/1.3-foss-2015b
 # conditional loading of modules based on aligner to be used by RSEM
 if [ $aligner == "bowtie" ]; then
   module load Bowtie/1.1.2-foss-2015b
@@ -88,24 +90,42 @@ if [ $run_rsem -eq 1 ]; then
   #TODO: think about how to replace the ugly ifs with a case switch
   #initalize variable
   rsem_opts=""
-  #add paired-end flag if data is PE
-  if [ $seq_mode = "PE" ]; then
+  if [ $seq_mode = "PE" ]; then #add paired-end flag if data is PE
     rsem_opts=$rsem_opts"--paired-end "
   fi
-  if [ "$file_type" = "bam" ]; then
-    #get files with .bam extention
-    f=($(ls  $sample_dir| grep -e ".bam"))
-    # get length of the array
-    file_number=${#f[@]}
+  if [ $file_type = "bam" ]; then #convert to fastq if input is bam
+    f=($(ls  $sample_dir | grep -e ".bam")) # get all bam files in folder
+    file_number=${#f[@]} # get length of the array
     if [ "$file_number" = "1" ]; then
-      rsem_opts=$rsem_opts"--bam $sample_dir/$f"
+      #sort bam file
+      samtools sort -n -m 4G -@ $threads -o $sample_dir/${f%.*}.sorted.bam \
+      $sample_dir/$f
+      if [ $seq_mode = "PE" ]; then
+        #convert bam to fastq then add to rsem_opts string
+        bedtools bamtofastq -i $sample_dir/${f%.*}.sorted.bam \
+          -fq $sample_dir/${f%.*}.1.fq \
+          -fq2 $sample_dir/${f%.*}.2.fq
+        rsem_opts=$rsem_opts"$sample_dir/${f%.*}.1.fq $sample_dir/${f%.*}.2.fq"
+      fi
+      if [ $seq_mode = "SE" ]; then
+        #convert bam to fastq then add to rsem_opts string
+        bedtools bamtofastq -i $sample_dir/${f%.*}.sorted.bam \
+          -fq $sample_dir/${f%.*}.fq
+        rsem_opts=$rsem_opts"$sample_dir/${f%.*}.fq "
+      fi
     else
       echo "Only one bam file per sample folder allowed! Aborting."\
            "Files present: $file_number" 1>&2
       exit 1
     fi
-  elif [ "$file_type" = "fastq" ]; then
+  elif [ $file_type = "fastq" ]; then
     rsem_opts=$rsem_opts
+    #check if fastq files are zipped and unzip them if needed
+    f=($(ls  $sample_dir | grep -e ".fq.gz\|.fastq.gz"))
+    file_number=${#f[@]}
+    if [ $file_number -eq 1 ] || [ $file_number -eq 2 ]; then
+      gunzip ${f[@]}
+    fi
     #get files with .fq or .fastq extention
     f=($(ls  $sample_dir| grep -e ".fq\|.fastq"))
     file_number=${#f[@]}
@@ -131,7 +151,7 @@ if [ $run_rsem -eq 1 ]; then
 # --calc-ci calcutates 95% confidence interval of the expression values
 # --ci-memory 30000 set memory
 rsem_params="--$aligner \
---num-threads 8 \
+--num-threads $threads \
 --temporary-folder $temp_dir_s \
 --append-names \
 --estimate-rspd \
@@ -156,6 +176,9 @@ fi
 
 #delete the temp files
 if [ $clean -eq 1 ]; then
+  gzip $sample_dir/*.fq $sample_dir/*.fastq
+  rm $sample_dir/${f%.*}.sorted.bam
+  rm $sample_dir/rsem/*.transcript.bam
   rm -rf $temp_dir_s
 fi
 
