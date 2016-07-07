@@ -25,8 +25,6 @@ file_type="fastq"
 pipe_dir=/lustre/scratch/users/$USER/pipelines/rsem-rna-seq-pipeline
 #set ouput base dir
 base_dir=/lustre/scratch/users/$USER/rna_seq
-#folder for aligment logs
-log_files=$base_dir/logs
 #folder for rsem reference
 rsem_ref_dir=/lustre/scratch/users/$USER/indices/rsem/$aligner/nod_v01
 #add folder basename as prefix (follows convention from rsem_make_reference)
@@ -85,14 +83,8 @@ cd $sample_dir/rsem/
 temp_dir_s=$temp_dir/$sample_name
 mkdir -p $temp_dir_s
 
-# run rsem to calculate the expression levels
-# --estimate-rspd: estimate read start position to check if the data has bias
-# --output-genome-bam: output bam file as genomic, not transcript coordinates
-# --seed 12345 set seed for reproducibility of rng
-# --calc-ci calcutates 95% confidence interval of the expression values
-# --ci-memory 30000 set memory
-
 if [ $run_rsem -eq 1 ]; then
+  #TODO: think about how to replace the ugly ifs with a case switch
   #initalize variable
   rsem_opts=""
   #add paired-end flag if data is PE
@@ -131,6 +123,12 @@ if [ $run_rsem -eq 1 ]; then
     exit 1
   fi
 
+# run rsem to calculate the expression levels
+# --estimate-rspd: estimate read start position to check if the data has bias
+# --output-genome-bam: output bam file as genomic, not transcript coordinates
+# --seed 12345 set seed for reproducibility of rng
+# --calc-ci calcutates 95% confidence interval of the expression values
+# --ci-memory 30000 set memory
 rsem_params="--$aligner \
 --num-threads 8 \
 --temporary-folder $temp_dir_s \
@@ -144,8 +142,8 @@ $rsem_opts \
 $rsem_ref \
 $sample_name"
 #rsem command that should be run
-echo "rsem-calculate-expression $rsem_params >& $log_files/$sample_name.rsem"
-eval "rsem-calculate-expression $rsem_params >& $log_files/$sample_name.rsem"
+echo "rsem-calculate-expression $rsem_params >& $sample_name.log"
+eval "rsem-calculate-expression $rsem_params >& $sample_name.log"
 fi
 
 #run the rsem plot function
