@@ -73,13 +73,13 @@ def generateColHeader(filename):
     kallisto_str = '_abundance.tsv'
     htseq_count = '.htseq-count'
     rsem_str = '.genes.results'
-    file = filename.split('/')[-1]
+    f = filename.split('/')[-1]
 
-    if kallisto_str in file:
+    if kallisto_str in f:
         name = file[:-len(kallisto_str)]
-    elif htseq_count in file:
+    elif htseq_count in f:
         name = file[:-len(htseq_count)]
-    elif rsem_str in file:
+    elif rsem_str in f:
         name = file[:-len(rsem_str)]
     else:
         name = file.split('.')[0]
