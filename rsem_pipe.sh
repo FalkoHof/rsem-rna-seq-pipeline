@@ -137,7 +137,6 @@ rsem_params="--$aligner \
 --estimate-rspd \
 --output-genome-bam \
 --sort-bam-by-coordinate \
---sampling-for-bam \
 --seed 12345 \
 --calc-ci \
 --ci-memory 40000 \
