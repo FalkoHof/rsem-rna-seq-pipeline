@@ -34,8 +34,9 @@ pbs_mapping_file=$pipe_dir/pbs_mapping_file.txt
 #super folder of the temp dir, script will create subfolders with $sample_name
 temp_dir=$base_dir/temp
 
-##### conditional loading of the required modules #####
+#####loading of the required modules #####
 module load RSEM/1.2.30-foss-2016a
+
 # conditional loading of modules based on aligner to be used by RSEM
 if [ $aligner == "bowtie" ]; then
   module load Bowtie/1.1.2-foss-2015b
@@ -135,6 +136,8 @@ rsem_params="--$aligner \
 --append-names \
 --estimate-rspd \
 --output-genome-bam \
+--sort-bam-by-coordinate \
+--sampling-for-bam \
 --seed 12345 \
 --calc-ci \
 --ci-memory 40000 \
@@ -144,6 +147,7 @@ $sample_name"
 #rsem command that should be run
 echo "rsem-calculate-expression $rsem_params >& $sample_name.log"
 eval "rsem-calculate-expression $rsem_params >& $sample_name.log"
+
 fi
 
 #run the rsem plot function
