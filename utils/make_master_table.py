@@ -14,7 +14,7 @@ desc = 'Concatenate a couple of tab delimted files based on the colum index \
 (0 based) to one master table file.\nUse c 1 for htseq-count, c 4 for \
 kallisto and c 5 RSEM TPM. See the respective files if you want to \
 concatenate other data. The file input name needs do be sourrounded by ""\
-quotation marks.
+quotation marks.'
 
 parser = argparse.ArgumentParser(description=desc,formatter_class=RawTextHelpFormatter)
 parser.add_argument('-s', '--sort', default = True, \
