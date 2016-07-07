@@ -166,7 +166,6 @@ $sample_name"
 #rsem command that should be run
 echo "rsem-calculate-expression $rsem_params >& $sample_name.log"
 eval "rsem-calculate-expression $rsem_params >& $sample_name.log"
-
 fi
 
 #run the rsem plot function
