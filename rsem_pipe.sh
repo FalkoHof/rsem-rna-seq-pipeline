@@ -61,6 +61,7 @@ sample_name=`basename $sample_dir` #get the base name of the dir as sample name
 #print some output for logging
 echo '#########################################################################'
 echo 'Starting RSEM RNA-seq pipeline for: '$sample_name
+echo 'Sample directory: ' $sample_dir
 echo 'Rsem reference: ' $rsem_ref
 echo 'Aligner to be used: ' $aligner
 echo 'Mapping file: ' $pbs_mapping_file
@@ -80,7 +81,7 @@ fi
 
 #make output folder
 mkdir -p $sample_dir/rsem/
-cd $sample_dir/rsem/
+cd $sample_dir
 
 #folders for temp files
 temp_dir_s=$temp_dir/$sample_name
@@ -163,6 +164,8 @@ rsem_params="--$aligner \
 $rsem_opts \
 $rsem_ref \
 $sample_name"
+#cd into output dir
+cd $sample_dir/rsem/
 #rsem command that should be run
 echo "rsem-calculate-expression $rsem_params >& $sample_name.log"
 eval "rsem-calculate-expression $rsem_params >& $sample_name.log"
