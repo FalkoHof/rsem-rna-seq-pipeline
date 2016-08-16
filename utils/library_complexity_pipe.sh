@@ -4,7 +4,7 @@
 #PBS -J 1-22
 #PBS -j oe
 #PBS -q workq
-#PBS -o /lustre/scratch/users/falko.hofmann/log/160202-lib_complexity
+#PBS -o /lustre/scratch/users/falko.hofmann/log/160816-lib_complexity_^array_index^_.log
 #PBS -l walltime=48:00:00
 #PBS -l select=1:ncpus=8:mem=16gb
 
@@ -20,7 +20,7 @@ pbs_mapping_file=$pipe_dir/pbs_mapping_file.txt
 #super folder of the temp dir, script will create subfolders with $sample_name
 temp_dir=$base_dir/temp/lib_complexity
 #some output folders
-picard_bin=lustre/scratch/users/$USER/software/picard/dist
+picard_bin=/lustre/scratch/users/$USER/software/picard/dist
 
 preseq_ouput=$base_dir/preseq
 picard_ouput=$base_dir/picard
