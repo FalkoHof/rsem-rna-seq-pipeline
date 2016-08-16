@@ -20,13 +20,12 @@ clean=0
 aligner="star"
 seq_mode="PE"
 file_type="fastq"
+threads=8 #set this to the number of available cores
 ##### specify folders and variables #####
 #set script dir
 pipe_dir=/lustre/scratch/users/$USER/pipelines/rsem-rna-seq-pipeline
 #set ouput base dir
 base_dir=/lustre/scratch/users/$USER/rna_seq
-#folder for aligment logs
-log_files=$base_dir/logs
 #folder for rsem reference
 rsem_ref_dir=/lustre/scratch/users/$USER/indices/rsem/$aligner/nod_v01
 #add folder basename as prefix (follows convention from rsem_make_reference)
@@ -36,8 +35,10 @@ pbs_mapping_file=$pipe_dir/pbs_mapping_file.txt
 #super folder of the temp dir, script will create subfolders with $sample_name
 temp_dir=$base_dir/temp
 
-##### conditional loading of the required modules #####
+#####loading of the required modules #####
 module load RSEM/1.2.30-foss-2016a
+module load BEDTools/v2.17.0-goolf-1.4.10
+module load SAMtools/1.3-foss-2015b
 # conditional loading of modules based on aligner to be used by RSEM
 if [ $aligner == "bowtie" ]; then
   module load Bowtie/1.1.2-foss-2015b
@@ -60,6 +61,7 @@ sample_name=`basename $sample_dir` #get the base name of the dir as sample name
 #print some output for logging
 echo '#########################################################################'
 echo 'Starting RSEM RNA-seq pipeline for: '$sample_name
+echo 'Sample directory: ' $sample_dir
 echo 'Rsem reference: ' $rsem_ref
 echo 'Aligner to be used: ' $aligner
 echo 'Mapping file: ' $pbs_mapping_file
@@ -79,49 +81,54 @@ fi
 
 #make output folder
 mkdir -p $sample_dir/rsem/
-cd $sample_dir/rsem/
+cd $sample_dir
 
 #folders for temp files
 temp_dir_s=$temp_dir/$sample_name
 mkdir -p $temp_dir_s
 
-# run rsem to calculate the expression levels
-# --estimate-rspd: estimate read start position to check if the data has bias
-# --output-genome-bam: output bam file as genomic, not transcript coordinates
-# --seed 12345 set seed for reproducibility of rng
-# --calc-ci calcutates 95% confidence interval of the expression values
-# --ci-memory 30000 set memory
-
-#some function to check the number of files present
-function get_files {
-  # get all files at a location with a specific extention
-  f=($(ls "$1" | grep -e "$2"))
-  echo $f
-}
-
 if [ $run_rsem -eq 1 ]; then
+  #TODO: think about how to replace the ugly ifs with a case switch
   #initalize variable
   rsem_opts=""
-  #add paired-end flag if data is PE
-  if [ $seq_mode = "PE" ]; then
+  if [ $seq_mode = "PE" ]; then #add paired-end flag if data is PE
     rsem_opts=$rsem_opts"--paired-end "
   fi
-  if [ "$file_type" = "bam" ]; then
-    f=($(ls  $sample_dir| grep -e ".bam"))
-    #f=$(get_files $sample_dir bam)
-    # get lenght of the array
-    file_number=${#f[@]}
+  if [ $file_type = "bam" ]; then #convert to fastq if input is bam
+    f=($(ls  $sample_dir | grep -e ".bam")) # get all bam files in folder
+    file_number=${#f[@]} # get length of the array
     if [ "$file_number" = "1" ]; then
-      rsem_opts=$rsem_opts"--bam $sample_dir/$f"
+      #sort bam file
+      samtools sort -n -m 4G -@ $threads -o $sample_dir/${f%.*}.sorted.bam \
+      $sample_dir/$f
+      if [ $seq_mode = "PE" ]; then
+        #convert bam to fastq then add to rsem_opts string
+        bedtools bamtofastq -i $sample_dir/${f%.*}.sorted.bam \
+          -fq $sample_dir/${f%.*}.1.fq \
+          -fq2 $sample_dir/${f%.*}.2.fq
+        rsem_opts=$rsem_opts"$sample_dir/${f%.*}.1.fq $sample_dir/${f%.*}.2.fq"
+      fi
+      if [ $seq_mode = "SE" ]; then
+        #convert bam to fastq then add to rsem_opts string
+        bedtools bamtofastq -i $sample_dir/${f%.*}.sorted.bam \
+          -fq $sample_dir/${f%.*}.fq
+        rsem_opts=$rsem_opts"$sample_dir/${f%.*}.fq "
+      fi
     else
       echo "Only one bam file per sample folder allowed! Aborting."\
            "Files present: $file_number" 1>&2
       exit 1
     fi
-  elif [ "$file_type" = "fastq" ]; then
+  elif [ $file_type = "fastq" ]; then
     rsem_opts=$rsem_opts
+    #check if fastq files are zipped and unzip them if needed
+    f=($(ls  $sample_dir | grep -e ".fq.gz\|.fastq.gz"))
+    file_number=${#f[@]}
+    if [ $file_number -eq 1 ] || [ $file_number -eq 2 ]; then
+      gunzip ${f[@]}
+    fi
+    #get files with .fq or .fastq extention
     f=($(ls  $sample_dir| grep -e ".fq\|.fastq"))
-    #f=$(get_files $sample_dir .fq\|.fastq)
     file_number=${#f[@]}
     #some error handling. Check if only the expected number of fq files is there
     if [ $file_number -eq 1 ]  && [ "$seq_mode" = "SE" ]; then
@@ -138,21 +145,30 @@ if [ $run_rsem -eq 1 ]; then
     exit 1
   fi
 
+# run rsem to calculate the expression levels
+# --estimate-rspd: estimate read start position to check if the data has bias
+# --output-genome-bam: output bam file as genomic, not transcript coordinates
+# --seed 12345 set seed for reproducibility of rng
+# --calc-ci calcutates 95% confidence interval of the expression values
+# --ci-memory 30000 set memory
 rsem_params="--$aligner \
---num-threads 8 \
+--num-threads $threads \
 --temporary-folder $temp_dir_s \
 --append-names \
 --estimate-rspd \
 --output-genome-bam \
+--sort-bam-by-coordinate \
 --seed 12345 \
 --calc-ci \
 --ci-memory 40000 \
 $rsem_opts \
 $rsem_ref \
 $sample_name"
+#cd into output dir
+cd $sample_dir/rsem/
 #rsem command that should be run
-echo "rsem-calculate-expression $rsem_params >& $log_files/$sample_name.rsem"
-eval "rsem-calculate-expression $rsem_params >& $log_files/$sample_name.rsem"
+echo "rsem-calculate-expression $rsem_params >& $sample_name.log"
+eval "rsem-calculate-expression $rsem_params >& $sample_name.log"
 fi
 
 #run the rsem plot function
@@ -162,6 +178,9 @@ fi
 
 #delete the temp files
 if [ $clean -eq 1 ]; then
+  gzip $sample_dir/*.fq $sample_dir/*.fastq
+  rm $sample_dir/${f%.*}.sorted.bam
+  rm $sample_dir/rsem/*.transcript.bam
   rm -rf $temp_dir_s
 fi
 
