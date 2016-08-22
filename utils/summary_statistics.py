@@ -1,8 +1,7 @@
 import glob
-import os.path
 import argparse
 from argparse import RawTextHelpFormatter
-
+from os.path import basename
 
 #for help see message displayed
 desc = ('Generates a summary table from RSEM alignment statistics. Use nix style'
