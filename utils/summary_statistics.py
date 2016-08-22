@@ -9,6 +9,7 @@ desc = ('Generates a summary table from RSEM alignment statistics. Use nix style
         'paths that can be globbed and point towards the from .cnt files as '
         'input.')
 
+parser = argparse.ArgumentParser(description=desc,formatter_class=RawTextHelpFormatter)
 parser.add_argument('-i', '--input', dest = 'input', metavar = 'i', type = str,\
                     help = 'name of the input path, supports globbing. \
                     Requires quotes around the value)', \
