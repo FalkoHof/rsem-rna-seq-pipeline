@@ -27,7 +27,7 @@ parser.add_argument('-c', '--columns', dest = 'columns', metavar = 'c', \
                     required = True)
 parser.add_argument('-i', '--input', dest = 'input', metavar = 'i', type = str,\
                     help = 'name of the input file, supports globbing. \
-                    Requires quotes arount the value)', \
+                    Requires quotes around the value)', \
                     required = True)
 parser.add_argument('-o', '--output', dest = 'output', metavar = 'o', \
                     type = str, help = 'name of the output file', \
