@@ -96,6 +96,6 @@ d = dict()
 files = getFileNames(inputPath)
 for f in files:
     lines = readFile(f)
-    d = processCntFile(lines)
+    d = processCntFile(lines, d)
 
-writeToFile(outputFile,d)
+writeToFile(outputFile, d)
