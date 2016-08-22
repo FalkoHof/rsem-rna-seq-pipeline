@@ -3,16 +3,16 @@
 #PBS -N make_rsem_reference
 #PBS -j oe
 #PBS -q workq
-#PBS -o /lustre/scratch/users/falko.hofmann/log/160625/160625_make_rsem_reference.log
+#PBS -o /lustre/scratch/users/falko.hofmann/log/rsem/ref/araport11_160706.log
 #PBS -l walltime=00:30:00
 #PBS -l select=1:ncpus=8:mem=64gb
 
 # === begin ENVIRONMENT SETUP ===
 ##### specify folders and variables #####
 aligner="star"
-annotation_file=/lustre/scratch/users/$USER/Ath_annotations/nod_v01/Arabidopsis_thaliana.TAIR10.30.nod_v01.gtf
+annotation_file=/lustre/scratch/users/$USER/Ath_annotations/araport11/Araport11_genes_transposons_fixed_201606.gtf
 fasta_file=/lustre/scratch/users/$USER/indices/fasta/Col_mS.fa
-out_dir=/lustre/scratch/users/$USER/indices/rsem/$aligner/nod_v01
+out_dir=/lustre/scratch/users/$USER/indices/rsem/$aligner/araport11
 prefix=`basename $out_dir`
 
 ##### load required modules #####
