@@ -93,7 +93,7 @@ def writeToFile(f,d):
 
 d = dict()
 files = getFileNames(inputPath)
-for fin files:
+for f in files:
     lines = readFile(f)
     d = processCntFile(lines)
 
