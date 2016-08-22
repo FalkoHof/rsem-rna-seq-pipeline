@@ -53,10 +53,10 @@ def getStatsFromCntFile(lines):
     # multi mapping reads (n) (1,1)
 
     mat = [l.strip('\n').split(' ') for l in lines[:2]]
-    n_tot = int(mat[0][3])
-    n_1 = int(mat[0][1])
-    n_uni = int(mat[1][0])
-    n_multi = int(mat[1][1])
+    n_tot = mat[0][3]
+    n_1 = mat[0][1]
+    n_uni =  mat[1][0]
+    n_multi = mat[1][1]
 
     stats = [n_tot,n_1,n_uni,n_multi]
     return '\t'.join(stats)
