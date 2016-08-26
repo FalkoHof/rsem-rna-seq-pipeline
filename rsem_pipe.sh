@@ -1,7 +1,7 @@
 #!/bin/bash
 #PBS -P rnaseq_nod
 #PBS -N rsem-pipe
-#PBS -J 1-2
+#PBS -J 1-65
 #PBS -j oe
 #PBS -q workq
 #PBS -o /lustre/scratch/users/falko.hofmann/log/160705_rsem/rsem-rna_^array_index^_mapping.log
@@ -81,16 +81,8 @@ if [ $file_type != "bam" ] && [ $file_type != "fastq" ]; then
 fi
 
 #make output folder
-<<<<<<< HEAD
-#mkdir -p $sample_dir/rsem/
-#cd $sample_dir/rsem/
-
-mkdir -p $sample_dir/rsem/all_minus_te
-cd $sample_dir/rsem/all_minus_te
-=======
 mkdir -p $sample_dir/rsem/
 cd $sample_dir
->>>>>>> develop
 
 #folders for temp files
 temp_dir_s=$temp_dir/$sample_name
