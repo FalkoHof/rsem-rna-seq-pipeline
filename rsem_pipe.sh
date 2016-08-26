@@ -173,10 +173,10 @@ if [ $run_rsem -eq 1 ]; then
             "See documentation for valid types"
           ;;
       esac
-  *) #exit when unexpected input is encountered
-    error_exit "Error: wrong paramter for seq type selected! Select PE or SE."
-    ;;
-esac
+    *) #exit when unexpected input is encountered
+      error_exit "Error: wrong paramter for seq type selected! Select PE or SE."
+      ;;
+  esac
 
 
 
