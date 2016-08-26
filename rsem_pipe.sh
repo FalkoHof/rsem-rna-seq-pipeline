@@ -81,16 +81,6 @@ echo 'Specified sequencing mode: ' $seq_type
 echo 'Specified adaptor type: ' $adaptor_type
 echo '#########################################################################'
 
-# #some paramter checking
-# if [ $seq_mode != "PE" ] && [ $seq_mode != "SE" ]; then
-#   echo "Wrong parameters selected for seq_mode! Aborting." 1>&2
-#   exit 1
-# fi
-# if [ $file_type != "bam" ] && [ $file_type != "fastq" ]; then
-#   echo "Wrong parameters selected for file_type! Aborting." 1>&2
-#   exit 1
-# fi
-
 #some error handling function
 function error_exit
 {
@@ -110,106 +100,90 @@ mkdir -p $temp_dir_s
 if [ $run_rsem -eq 1 ]; then
   #1. check file typ and convert to fastq
   case $file_type in
-    "bam") #convert the bam file to fastq
-      echo "Converting bam to fastq..."
-      #sort bam file
+    "bam")
+      f=($(ls $sample_dir | grep -e ".bam")) # get all bam files in folder
+      if [[ "${#f[@]}" -ne "1" ]]; then #throw error if more than 1 is present
+        error_exit "Error: wrong number of bam files in folder"
+      fi
       samtools sort -n -m 4G -@ $threads -o $sample_dir/${f%.*}.sorted.bam \
         $sample_dir/$f
+      bedtools_params="bedtools bamtofastq -i $sample_dir/${f%.*}.sorted.bam "
       case $seq_type in
-        "PE") #convert to PE fq
-          bedtools bamtofastq -i $sample_dir/${f%.*}.sorted.bam \
-            -fq $sample_dir/${f%.*}.1.fq \
-            -fq2 $sample_dir/${f%.*}.2.fq
-          #TODO add samples to command string
+        "PE") #modify bedtools params for PE conversion
+          bedtools_params=$bedtools_params" -fq $sample_dir/${f%.*}.1.fq"\
+            " -fq2 $sample_dir/${f%.*}.2.fq"
           ;;
-        "SE") #convert to SE fq
-          bedtools bamtofastq -i $sample_dir/${f%.*}.sorted.bam \
-            -fq $sample_dir/${f%.*}.fq
-          #TODO add sample to command string
+        "SE") #modify bedtools params for SE conversion
+          bedtools_params=$bedtools_params" -fq $sample_dir/${f%.*}.fq"
           ;;
         *) #exit when unexpected input is encountered
           error_exit "Error: wrong paramter for seq type selected! Select PE or SE."
           ;;
       esac
-      echo "Converting bam to fastq... - Done"
+      #print the command to be exectuted
+      echo "Command exectuted for converting bam to fastq:\n $bedtools_params"
+      eval $bedtools_params #run the command
     "fq")
       # do nothing...
     *) #exit when unexpected input is encountered
       error_exit "Error: wrong paramter for file type selected! Select bam or fq."
       ;;
   esac
+
 #2. do adaptor trimming according to seq_type and adaptor_type
-  case $seq_type in
-    "PE") #do contidional PE trimming
-      case $adaptor_type in
-        "nextera")
-        trim_galore --nextera
-          --paired
-        "unknown")
-          #TODO run trim galore with autodetect
-        "none")
-          #Do nothing
-        ^[NCAGTncagt\/]+$) #check if alphabet corresponds to the genetic alphabet
-          #TODO implement that sequences are paresed from the column
-        *) #exit when unexpected input is encountered
-          error_exit "Error: Wrong paramter for adaptor type selected!" \
-            "See documentation for valid types"
-          ;;
-      esac
-    "SE")
-      case $adaptor_type in
-        "nextera")
-        #TODO run trim galore with nextera flag
-          # trim_galore --nextera
-          #   --paired
-        "unknown")
-          #TODO run trim galore with autodetect
-        "none")
-          #Do nothing
-        ^[CAGTcagt\/]+$)
-          #TODO implement that sequences are paresed from the column
-        *)
-          error_exit "Error: wrong paramter for adaptor type selected!" \
-            "See documentation for valid types"
-          ;;
-      esac
+  #ge
+  f=($(ls $sample_dir | grep -e ".fq.gz\|.fastq.gz"))
+  #check if more than 0 zipped files are present, if so unzip
+  if [[ "${#f[@]}" -gt "0" ]]; then
+    gunzip ${f[@]}
+  fi
+  f=($(ls $sample_dir| grep -e ".fq\|.fastq"))
+
+  trim_params="trim_galore --dont_gzip --stringency 4 -o $sample_dir"
+  case $adaptor_type in
+    "nextera")
+      trimming=$trimming" --nextera"
+    "illumina")
+      trimming=$trimming" --illumina"
+    "unknown") #run trim galore with autodetect
+      #do nothing == autodetect
+    "none")
+      trim_params="No trimming selected..." #Don't trimm
+    ^[NCAGTncagt]+$) #check if alphabet corresponds to the genetic alphabet
+      if [[ $seq_type == "SE" ; then
+        trimming=$trimming" -a $adaptor_type"
+      else
+        error_exit "Error: Wrong paramter for adaptor or seq type selected!" \
+          "See documentation for valid types"
+      fi
+    ^[NCAGTncagt\/]+$) #check if alphabet corresponds to the genetic alphabet
+      if [[ $seq_type == "PE" ; then
+        seqs=(${adaptor_type//\// })
+        trimming=$trimming" -a ${seqs[0]} -a2 ${seqs[1]}"
+      else
+        error_exit "Error: Wrong paramter for adaptor or seq type selected!" \
+          "See documentation for valid types"
+      fi
     *) #exit when unexpected input is encountered
-      error_exit "Error: wrong paramter for seq type selected! Select PE or SE."
+      error_exit "Error: Wrong paramter for adaptor type selected!" \
+        "See documentation for valid types"
       ;;
   esac
 
-
-
-#rsem_opts=$rsem_opts"$sample_dir/${f%.*}.fq "
-#rsem_opts=$rsem_opts"$sample_dir/${f%.*}.1.fq $sample_dir/${f%.*}.2.fq"
-
-
-  #if file_type bam
-    #if PE
-      # --> convert to 2fq
-      #check if some reads need to be removed?
-    #if SE
-      # --> convert to 1fq
-  #else if FQ
-    #do nothing
-
-  #trim adaptors
-
-
-
-
-  #if PE OR SE
-    # if PE make
-
-
-
-
-
-
-
-
-
-
+  case $seq_type in
+    "PE")
+      trim_params=$trim_params" --paired"
+      trim_params=$trim_params" $sample_dir/${f%.*}.1.fq $sample_dir/${f%.*}.2.fq"
+      ;;
+    "SE")
+      trim_params=$trim_params" $sample_dir/${f%.*}.fq "
+      ;;
+  esac
+  #print the command to be exectuted
+  echo "Command exectuted for adaptor trimming:\n $trim_params"
+  if [[ $adaptor_type != "none" ]]; then
+    eval "$trim_params" #run the command
+  fi
 
 
   # #TODO: think about how to replace the ugly ifs with a case switch
