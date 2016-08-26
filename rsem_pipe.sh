@@ -19,8 +19,8 @@ make_plots=0
 clean=0
 ##### specify RSEM parameters
 aligner="star"
-seq_mode="PE"
-file_type="fastq"
+#seq_mode="PE"
+#file_type="fastq"
 threads=8 #set this to the number of available cores
 ##### specify folders and variables #####
 #set script dir
@@ -42,8 +42,8 @@ module load BEDTools/v2.17.0-goolf-1.4.10
 module load SAMtools/1.3-foss-2015b
 #module load cutadapt/1.9.1-foss-2016a-Python-2.7.11
 module load Trim_Galore/0.4.1-foss-2015a
-nextera_r1="CTGTCTCTTATACACATCTCCGAGCCCACGAGAC"
-nextera_r2="CTGTCTCTTATACACATCTGACGCTGCCGACGA"
+#nextera_r1="CTGTCTCTTATACACATCTCCGAGCCCACGAGAC"
+#nextera_r2="CTGTCTCTTATACACATCTGACGCTGCCGACGA"
 
 # conditional loading of modules based on aligner to be used by RSEM
 if [ $aligner == "bowtie" ]; then
@@ -89,7 +89,6 @@ function error_exit
 }
 
 #make output folder
-mkdir -p $sample_dir/rsem/
 cd $sample_dir
 
 #folders for temp files
@@ -101,6 +100,7 @@ if [ $run_rsem -eq 1 ]; then
   #1. check file typ and convert to fastq
   case $file_type in
     "bam")
+      echo "File type bam. Converting to fastq..."
       f=($(ls $sample_dir | grep -e ".bam")) # get all bam files in folder
       if [[ "${#f[@]}" -ne "1" ]]; then #throw error if more than 1 is present
         error_exit "Error: wrong number of bam files in folder"
@@ -123,7 +123,9 @@ if [ $run_rsem -eq 1 ]; then
       #print the command to be exectuted
       echo "Command exectuted for converting bam to fastq:\n $bedtools_params"
       eval $bedtools_params #run the command
+      echo "Converting to fastq... Done"
     "fq")
+      echo "File type fastq. No conversion necessary..."
       # do nothing...
     *) #exit when unexpected input is encountered
       error_exit "Error: wrong paramter for file type selected! Select bam or fq."
@@ -143,12 +145,16 @@ if [ $run_rsem -eq 1 ]; then
   case $adaptor_type in
     "nextera")
       trimming=$trimming" --nextera"
+      ;;
     "illumina")
       trimming=$trimming" --illumina"
+      ;;
     "unknown") #run trim galore with autodetect
       #do nothing == autodetect
+      ;;
     "none")
       trim_params="No trimming selected..." #Don't trimm
+      ;;
     ^[NCAGTncagt]+$) #check if alphabet corresponds to the genetic alphabet
       if [[ $seq_type == "SE" ; then
         trimming=$trimming" -a $adaptor_type"
@@ -156,6 +162,7 @@ if [ $run_rsem -eq 1 ]; then
         error_exit "Error: Wrong paramter for adaptor or seq type selected!" \
           "See documentation for valid types"
       fi
+      ;;
     ^[NCAGTncagt\/]+$) #check if alphabet corresponds to the genetic alphabet
       if [[ $seq_type == "PE" ; then
         seqs=(${adaptor_type//\// })
@@ -164,19 +171,30 @@ if [ $run_rsem -eq 1 ]; then
         error_exit "Error: Wrong paramter for adaptor or seq type selected!" \
           "See documentation for valid types"
       fi
+      ;;
     *) #exit when unexpected input is encountered
       error_exit "Error: Wrong paramter for adaptor type selected!" \
         "See documentation for valid types"
       ;;
   esac
 
+  fq1=""
+  fq2=""
+  fq=""
   case $seq_type in
     "PE")
-      trim_params=$trim_params" --paired"
-      trim_params=$trim_params" $sample_dir/${f%.*}.1.fq $sample_dir/${f%.*}.2.fq"
+      trim_params=$trim_params" --paired" \
+        " $sample_dir/${f%.*}.1.fq $sample_dir/${f%.*}.2.fq"
+      fq1=$sample_dir/${f%.*}.1_val_1.fq
+      fq1=$sample_dir/${f%.*}.2_val_2.fq
       ;;
     "SE")
       trim_params=$trim_params" $sample_dir/${f%.*}.fq "
+      fq=$sample_dir/${f%.*}_trimmed.fq
+      ;;
+    *) #exit when unexpected input is encountered
+      error_exit "Error: Wrong paramter for seq type selected!" \
+        "See documentation for valid types"
       ;;
   esac
   #print the command to be exectuted
@@ -185,96 +203,44 @@ if [ $run_rsem -eq 1 ]; then
     eval "$trim_params" #run the command
   fi
 
+  rsem_opts=""
+  case $seq_type in
+    "PE")
+      rsem_opts=$rsem_opts"--paired-end $fq1 $fq2"
+    "SE")
+      rsem_opts=$rsem_opts"$fq"
+      ;;
+    *) #exit when unexpected input is encountered
+      error_exit "Error: Wrong paramter for seq type selected!" \
+        "See documentation for valid types"
+      ;;
+  esac
 
-  # #TODO: think about how to replace the ugly ifs with a case switch
-  # #initalize variable
-  # rsem_opts=""
-  # if [ $seq_mode = "PE" ]; then #add paired-end flag if data is PE
-  #   rsem_opts=$rsem_opts"--paired-end "
-  # fi
-  # if [ $file_type = "bam" ]; then #convert to fastq if input is bam
-  #   f=($(ls  $sample_dir | grep -e ".bam")) # get all bam files in folder
-  #   file_number=${#f[@]} # get length of the array
-  #   if [ "$file_number" = "1" ]; then
-  #     #sort bam file
-  #     samtools sort -n -m 4G -@ $threads -o $sample_dir/${f%.*}.sorted.bam \
-  #     $sample_dir/$f
-  #     if [ $seq_mode = "PE" ]; then
-  #       #convert bam to fastq then add to rsem_opts string
-  #       bedtools bamtofastq -i $sample_dir/${f%.*}.sorted.bam \
-  #         -fq $sample_dir/${f%.*}.1.fq \
-  #         -fq2 $sample_dir/${f%.*}.2.fq
-  #
-  #       cutadapt --match-read-wildcards -f fastq -O 4 -a $nextera_r1 $1 -o $2 > $3
-  #       cutadapt --match-read-wildcards -f fastq -O 4 -a $nextera_r2 $1 -o $2 > $3
-  #
-  #       rsem_opts=$rsem_opts"$sample_dir/${f%.*}.1.fq $sample_dir/${f%.*}.2.fq"
-  #     fi
-  #     if [ $seq_mode = "SE" ]; then
-  #       #convert bam to fastq then add to rsem_opts string
-  #       bedtools bamtofastq -i $sample_dir/${f%.*}.sorted.bam \
-  #         -fq $sample_dir/${f%.*}.fq
-  #       rsem_opts=$rsem_opts"$sample_dir/${f%.*}.fq "
-  #     fi
-  #   else
-  #     echo "Only one bam file per sample folder allowed! Aborting."\
-  #          "Files present: $file_number" 1>&2
-  #     exit 1
-  #   fi
-  # elif [ $file_type = "fastq" ]; then
-  #   rsem_opts=$rsem_opts
-  #   #check if fastq files are zipped and unzip them if needed
-  #   f=($(ls  $sample_dir | grep -e ".fq.gz\|.fastq.gz"))
-  #   file_number=${#f[@]}
-  #   if [ $file_number -eq 1 ] || [ $file_number -eq 2 ]; then
-  #     gunzip ${f[@]}
-  #   fi
-  #   #get files with .fq or .fastq extention
-  #   f=($(ls  $sample_dir| grep -e ".fq\|.fastq"))
-  #   file_number=${#f[@]}
-  #   #some Error:handling. Check if only the expected number of fq files is there
-  #   if [ $file_number -eq 1 ]  && [ "$seq_mode" = "SE" ]; then
-  #     rsem_opts=$rsem_opts"$sample_dir/$f"
-  #   elif [ $file_number -eq 2 ]  && [ "$seq_mode" = "PE" ]; then
-  #     rsem_opts=$rsem_opts"$sample_dir/${f[0]} $sample_dir/${f[1]}"
-  #   else
-  #     echo "Wrong number of fastq files in sample folder! Aborting."\
-  #          "Files present: $file_number" 1>&2
-  #     exit 1
-  #   fi
-  # else
-  #   echo "Unsupported file type selected! Aborting." 1>&2
-  #   exit 1
-  # fi
+  # run rsem to calculate the expression levels
+  # --estimate-rspd: estimate read start position to check if the data has bias
+  # --output-genome-bam: output bam file as genomic, not transcript coordinates
+  # --seed 12345 set seed for reproducibility of rng
+  # --calc-ci calcutates 95% confidence interval of the expression values
+  # --ci-memory 30000 set memory
+  rsem_params="--$aligner" \
+    " --num-threads $threads" \
+    " --temporary-folder $temp_dir_s" \
+    " --append-names" \
+    " --estimate-rspd" \
+    " --output-genome-bam" \
+    " --sort-bam-by-coordinate" \
+    " --seed 12345" \
+    " --calc-ci" \
+    " --ci-memory 40000" \
+    " $rsem_opts" \
+    " $rsem_ref" \
+    " $sample_name"
 
-
-
-
-
-# run rsem to calculate the expression levels
-# --estimate-rspd: estimate read start position to check if the data has bias
-# --output-genome-bam: output bam file as genomic, not transcript coordinates
-# --seed 12345 set seed for reproducibility of rng
-# --calc-ci calcutates 95% confidence interval of the expression values
-# --ci-memory 30000 set memory
-rsem_params="--$aligner \
---num-threads $threads \
---temporary-folder $temp_dir_s \
---append-names \
---estimate-rspd \
---output-genome-bam \
---sort-bam-by-coordinate \
---seed 12345 \
---calc-ci \
---ci-memory 40000 \
-$rsem_opts \
-$rsem_ref \
-$sample_name"
-#cd into output dir
-cd $sample_dir/rsem/
-#rsem command that should be run
-echo "rsem-calculate-expression $rsem_params >& $sample_name.log"
-eval "rsem-calculate-expression $rsem_params >& $sample_name.log"
+  cd $sample_dir/rsem/
+  mkdir -p $sample_dir/rsem/
+  #rsem command that should be run
+  echo "rsem-calculate-expression $rsem_params >& $sample_name.log"
+  eval "rsem-calculate-expression $rsem_params >& $sample_name.log"
 fi
 
 #run the rsem plot function
@@ -291,3 +257,65 @@ if [ $clean -eq 1 ]; then
 fi
 
 echo 'Finished RSEM RNA-seq pipeline for: '$sample_name
+
+
+# #TODO: think about how to replace the ugly ifs with a case switch
+# #initalize variable
+# rsem_opts=""
+# if [ $seq_mode = "PE" ]; then #add paired-end flag if data is PE
+#   rsem_opts=$rsem_opts"--paired-end "
+# fi
+# if [ $file_type = "bam" ]; then #convert to fastq if input is bam
+#   f=($(ls  $sample_dir | grep -e ".bam")) # get all bam files in folder
+#   file_number=${#f[@]} # get length of the array
+#   if [ "$file_number" = "1" ]; then
+#     #sort bam file
+#     samtools sort -n -m 4G -@ $threads -o $sample_dir/${f%.*}.sorted.bam \
+#     $sample_dir/$f
+#     if [ $seq_mode = "PE" ]; then
+#       #convert bam to fastq then add to rsem_opts string
+#       bedtools bamtofastq -i $sample_dir/${f%.*}.sorted.bam \
+#         -fq $sample_dir/${f%.*}.1.fq \
+#         -fq2 $sample_dir/${f%.*}.2.fq
+#
+#       cutadapt --match-read-wildcards -f fastq -O 4 -a $nextera_r1 $1 -o $2 > $3
+#       cutadapt --match-read-wildcards -f fastq -O 4 -a $nextera_r2 $1 -o $2 > $3
+#
+#       rsem_opts=$rsem_opts"$sample_dir/${f%.*}.1.fq $sample_dir/${f%.*}.2.fq"
+#     fi
+#     if [ $seq_mode = "SE" ]; then
+#       #convert bam to fastq then add to rsem_opts string
+#       bedtools bamtofastq -i $sample_dir/${f%.*}.sorted.bam \
+#         -fq $sample_dir/${f%.*}.fq
+#       rsem_opts=$rsem_opts"$sample_dir/${f%.*}.fq "
+#     fi
+#   else
+#     echo "Only one bam file per sample folder allowed! Aborting."\
+#          "Files present: $file_number" 1>&2
+#     exit 1
+#   fi
+# elif [ $file_type = "fastq" ]; then
+#   rsem_opts=$rsem_opts
+#   #check if fastq files are zipped and unzip them if needed
+#   f=($(ls  $sample_dir | grep -e ".fq.gz\|.fastq.gz"))
+#   file_number=${#f[@]}
+#   if [ $file_number -eq 1 ] || [ $file_number -eq 2 ]; then
+#     gunzip ${f[@]}
+#   fi
+#   #get files with .fq or .fastq extention
+#   f=($(ls  $sample_dir| grep -e ".fq\|.fastq"))
+#   file_number=${#f[@]}
+#   #some Error:handling. Check if only the expected number of fq files is there
+#   if [ $file_number -eq 1 ]  && [ "$seq_mode" = "SE" ]; then
+#     rsem_opts=$rsem_opts"$sample_dir/$f"
+#   elif [ $file_number -eq 2 ]  && [ "$seq_mode" = "PE" ]; then
+#     rsem_opts=$rsem_opts"$sample_dir/${f[0]} $sample_dir/${f[1]}"
+#   else
+#     echo "Wrong number of fastq files in sample folder! Aborting."\
+#          "Files present: $file_number" 1>&2
+#     exit 1
+#   fi
+# else
+#   echo "Unsupported file type selected! Aborting." 1>&2
+#   exit 1
+# fi
