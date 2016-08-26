@@ -1,11 +1,11 @@
 #!/bin/bash
 #PBS -P rnaseq_nod
 #PBS -N lib_complexity_pipe
-#PBS -J 1-22
+#PBS -J 1-58
 #PBS -j oe
 #PBS -q workq
 #PBS -o /lustre/scratch/users/falko.hofmann/log/160816-lib_complexity_^array_index^_.log
-#PBS -l walltime=48:00:00
+#PBS -l walltime=12:00:00
 #PBS -l select=1:ncpus=8:mem=16gb
 
 #set variables
