@@ -51,14 +51,27 @@ $ git checkout some_fix
 
 ## 2. make_pbs_mapping_table.sh
 - Bash script to create a mapping file for pbs array jobs. Should be run via the
-  standard shell environment and needs an folder as command line argument.
+  standard shell environment (e.g. submit a small interactive job and run it
+  there). Needs an folder as command line argument.
   The script will list the subfolders and output a mapping of
-  <line number> <dir> to stdout. Pipe the output to a file and specify this
-  file in the rsem_pipe.sh script. The idea here is that you don't manually need
-  to type in sample names when you want to submit a batch job. Just input the
-  super folder of all your samples as command line argument.
+  <line number> <dir> <file_type> <seq_mode> <adaptor> to stdout. The default
+  for adaptor is 'unknown', which will trigger trim_galore to run in auto
+  detect adaptor type mode. If you want to explicitly specify an adapter you
+  need to do so by hand. You can also type in DNA sequences in this field and
+  use the / delimiter as in <adaptor1>/<adaptor2> to specifiy fw and rv adaptors
+  in PE mode (see also example below).
+
+  Pipe the output to a file and specify that file in the rsem_pipe.sh script.
+  The idea here is that you don't manually need to type in sample names when you
+  want to submit a batch job. Just input the super folder of all your samples
+  as command line argument.
   ```
   example: ./make_pbs_mapping_table.sh /Some/Super/Folders/ > pbs_mapping_file.txt
+
+  or if you have not set the excutable bit
+
+  example: sh make_pbs_mapping_table.sh /Some/Super/Folders/ > pbs_mapping_file.txt
+
   ```
 - Afterwards I would recommend to briefly check if the paths in the
   'pbs_mapping_file.txt' are correct. I would also recommend to create this file
@@ -70,8 +83,12 @@ $ git checkout some_fix
 - Alternatively the file can also be generated manually as e.g. shown below:
 
   ```shell
-  1 /Some/Folder/RNA-seq/sample_x/
-  2 /Some/Folder/RNA-seq/sample_y/
+  1 /Some/Folder/RNA-seq/sample_x/ fq SE illumina
+  2 /Some/Folder/RNA-seq/sample_y/ bam PE nextera
+  3 /Some/Folder/RNA-seq/sample_y/ fq SE unknown
+  4 /Some/Folder/RNA-seq/sample_y/ fq SE ACGTTGG
+  5 /Some/Folder/RNA-seq/sample_y/ fq PE ACGTTGG/TAGGCCT
+
   ...
   ```
 
