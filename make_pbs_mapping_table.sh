@@ -32,7 +32,6 @@ do
     check_for_bam="yes"
   fi
 
-
   if [[ "$check_for_bam" == "yes" ]]; then
     bam=($(ls $d | grep -e ".bam")) #grep all bam files
     #some sanity checking...
