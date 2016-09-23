@@ -1,6 +1,7 @@
 #!/bin/bash
-#load samtools modulem
-module load SAMtools/1.3.1-foss-2016a
+#load samtools module and redirect out put to null to give a clean ouput
+ml SAMtools/1.3.1-foss-2016a &> /dev/null
+
 input_dir=$1 #uses folder supplied by command line args
 x=1 #counter later used for pbs array index number
 
@@ -16,7 +17,7 @@ do
 
   fq=($(ls $d | grep -e ".fq.gz\|.fastq.gz|.fq\|.fastq")) #grep all fq files
   #some sanity checking...
-  if [["${#fq[@]}" -gt "2" ]]; then
+  if [[ "${#fq[@]}" -gt "2" ]]; then
     echo "Warning! More than 2 fq files found! Skipping... Check path $d" >&2
   #when 2 fq files are found mode is PE and fq
   elif [[ "${#fq[@]}" -eq "2" ]]; then
@@ -35,7 +36,7 @@ do
   if [[ "$check_for_bam" == "yes" ]]; then
     bam=($(ls $d | grep -e ".bam")) #grep all bam files
     #some sanity checking...
-    if [["${#bam[@]}" -gt "1" ]]; then
+    if [[ "${#bam[@]}" -gt "1" ]]; then
       echo "Warning! More than 1 bam file found! Skipping... Check path $d" >&2
     #when a bam file is found set the mode to bam end test the seq_type
     elif [[ "${#bam[@]}" -eq "1" ]]; then
