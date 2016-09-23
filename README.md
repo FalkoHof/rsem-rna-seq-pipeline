@@ -60,8 +60,7 @@ $ git checkout some_fix
   need to do so by hand. You can also type in DNA sequences in this field and
   use the / delimiter as in <adaptor1>/<adaptor2> to specifiy fw and rv adaptors
   in PE mode (see also example below).
-
-  Pipe the output to a file and specify that file in the rsem_pipe.sh script.
+- Pipe the output to a file and specify that file in the rsem_pipe.sh script.
   The idea here is that you don't manually need to type in sample names when you
   want to submit a batch job. Just input the super folder of all your samples
   as command line argument.
