@@ -4,9 +4,9 @@
 #PBS -J 1-22
 #PBS -j oe
 #PBS -q workq
-#PBS -o /lustre/scratch/users/falko.hofmann/log/160816-lib_complexity_^array_index^_.log
+#PBS -o /lustre/scratch/users/falko.hofmann/log/160202-lib_complexity
 #PBS -l walltime=48:00:00
-#PBS -l select=1:ncpus=8:mem=16gb
+#PBS -l select=1:ncpus=8:mem=34gb
 
 #set variables
 
@@ -20,7 +20,7 @@ pbs_mapping_file=$pipe_dir/pbs_mapping_file.txt
 #super folder of the temp dir, script will create subfolders with $sample_name
 temp_dir=$base_dir/temp/lib_complexity
 #some output folders
-picard_bin=/lustre/scratch/users/$USER/software/picard/dist
+picard_bin=lustre/scratch/users/$USER/software/picard/dist
 
 preseq_ouput=$base_dir/preseq
 picard_ouput=$base_dir/picard
@@ -57,9 +57,10 @@ mkdir -p $picard_ouput
 mkdir -p $temp_dir_s
 
 samtools view -b -f 0x2 $bam_file > $bam_file_concordant
+samtools sort -m 4G -@ 8 -o  $bam_file_concordant
 
-bedtools bamtobed -i $bam_file_concordant > $bed_file
-sort -k 1,1 -k 2,2n -k 3,3n -k 6,6 $bed_file > $bed_file_sorted
+#bedtools bamtobed -i $bam_file_concordant > $bed_file
+#sort -k 1,1 -k 2,2n -k 3,3n -k 6,6 $bed_file > $bed_file_sorted
 
 #run preseq
 preseq c_curve -P -s 100000 -o $preseq_ouput/$sample_name'_preseq_c_curve.txt' \
