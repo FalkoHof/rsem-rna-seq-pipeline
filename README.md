@@ -68,7 +68,7 @@ $ git checkout some_fix
   ```
   example: ./make_pbs_mapping_table.sh /Some/Super/Folders/ > pbs_mapping_file.txt
 
-  or if you have not set the excutable bit
+  or if you have not set the excutable bit...
 
   example: sh make_pbs_mapping_table.sh /Some/Super/Folders/ > pbs_mapping_file.txt
 
@@ -83,11 +83,11 @@ $ git checkout some_fix
 - Alternatively the file can also be generated manually as e.g. shown below:
 
   ```shell
-  1 /Some/Folder/RNA-seq/sample_x/ fq SE illumina
-  2 /Some/Folder/RNA-seq/sample_y/ bam PE nextera
-  3 /Some/Folder/RNA-seq/sample_y/ fq SE unknown
-  4 /Some/Folder/RNA-seq/sample_y/ fq SE ACGTTGG
-  5 /Some/Folder/RNA-seq/sample_y/ fq PE ACGTTGG/TAGGCCT
+  1 /Some/Folder/RNA-seq/sample_a/ fq SE illumina
+  2 /Some/Folder/RNA-seq/sample_b/ bam PE nextera
+  3 /Some/Folder/RNA-seq/sample_c/ fq SE unknown
+  4 /Some/Folder/RNA-seq/sample_d/ fq SE ACGTTGG
+  5 /Some/Folder/RNA-seq/sample_e/ fq PE ACGTTGG/TAGGCCT
 
   ...
   ```
