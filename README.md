@@ -64,6 +64,7 @@ $ git checkout some_fix
   The idea here is that you don't manually need to type in sample names when you
   want to submit a batch job. Just input the super folder of all your samples
   as command line argument.
+
   ```
   example: ./make_pbs_mapping_table.sh /Some/Super/Folders/ > pbs_mapping_file.txt
 
