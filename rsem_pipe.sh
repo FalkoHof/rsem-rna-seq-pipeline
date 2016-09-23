@@ -8,6 +8,8 @@
 #PBS -l walltime=24:00:00
 #PBS -l select=1:ncpus=8:mem=48gb
 
+
+#TODO: update README & make the make_pbs_mapping file.
 # === begin ENVIRONMENT SETUP ===
 ####set to 0 (false) or 1 (true) to let the repsective code block run
 #1. run rsem
@@ -102,8 +104,9 @@ if [ $run_rsem -eq 1 ]; then
     "bam")
       echo "File type bam. Converting to fastq..."
       f=($(ls $sample_dir | grep -e ".bam")) # get all bam files in folder
-      if [[ "${#f[@]}" -ne "1" ]]; then #throw error if more than 1 is present
-        error_exit "Error: wrong number of bam files in folder"
+      #throw error if more or less than 1 file is present
+      if [[ "${#f[@]}" -ne "1" ]]; then
+        error_exit "Error: wrong number of bam files in folder. Files present: ${#f[@]}"
       fi
       samtools sort -n -m 4G -@ $threads -o $sample_dir/${f%.*}.sorted.bam \
         $sample_dir/$f
@@ -257,65 +260,3 @@ if [ $clean -eq 1 ]; then
 fi
 
 echo 'Finished RSEM RNA-seq pipeline for: '$sample_name
-
-
-# #TODO: think about how to replace the ugly ifs with a case switch
-# #initalize variable
-# rsem_opts=""
-# if [ $seq_mode = "PE" ]; then #add paired-end flag if data is PE
-#   rsem_opts=$rsem_opts"--paired-end "
-# fi
-# if [ $file_type = "bam" ]; then #convert to fastq if input is bam
-#   f=($(ls  $sample_dir | grep -e ".bam")) # get all bam files in folder
-#   file_number=${#f[@]} # get length of the array
-#   if [ "$file_number" = "1" ]; then
-#     #sort bam file
-#     samtools sort -n -m 4G -@ $threads -o $sample_dir/${f%.*}.sorted.bam \
-#     $sample_dir/$f
-#     if [ $seq_mode = "PE" ]; then
-#       #convert bam to fastq then add to rsem_opts string
-#       bedtools bamtofastq -i $sample_dir/${f%.*}.sorted.bam \
-#         -fq $sample_dir/${f%.*}.1.fq \
-#         -fq2 $sample_dir/${f%.*}.2.fq
-#
-#       cutadapt --match-read-wildcards -f fastq -O 4 -a $nextera_r1 $1 -o $2 > $3
-#       cutadapt --match-read-wildcards -f fastq -O 4 -a $nextera_r2 $1 -o $2 > $3
-#
-#       rsem_opts=$rsem_opts"$sample_dir/${f%.*}.1.fq $sample_dir/${f%.*}.2.fq"
-#     fi
-#     if [ $seq_mode = "SE" ]; then
-#       #convert bam to fastq then add to rsem_opts string
-#       bedtools bamtofastq -i $sample_dir/${f%.*}.sorted.bam \
-#         -fq $sample_dir/${f%.*}.fq
-#       rsem_opts=$rsem_opts"$sample_dir/${f%.*}.fq "
-#     fi
-#   else
-#     echo "Only one bam file per sample folder allowed! Aborting."\
-#          "Files present: $file_number" 1>&2
-#     exit 1
-#   fi
-# elif [ $file_type = "fastq" ]; then
-#   rsem_opts=$rsem_opts
-#   #check if fastq files are zipped and unzip them if needed
-#   f=($(ls  $sample_dir | grep -e ".fq.gz\|.fastq.gz"))
-#   file_number=${#f[@]}
-#   if [ $file_number -eq 1 ] || [ $file_number -eq 2 ]; then
-#     gunzip ${f[@]}
-#   fi
-#   #get files with .fq or .fastq extention
-#   f=($(ls  $sample_dir| grep -e ".fq\|.fastq"))
-#   file_number=${#f[@]}
-#   #some Error:handling. Check if only the expected number of fq files is there
-#   if [ $file_number -eq 1 ]  && [ "$seq_mode" = "SE" ]; then
-#     rsem_opts=$rsem_opts"$sample_dir/$f"
-#   elif [ $file_number -eq 2 ]  && [ "$seq_mode" = "PE" ]; then
-#     rsem_opts=$rsem_opts"$sample_dir/${f[0]} $sample_dir/${f[1]}"
-#   else
-#     echo "Wrong number of fastq files in sample folder! Aborting."\
-#          "Files present: $file_number" 1>&2
-#     exit 1
-#   fi
-# else
-#   echo "Unsupported file type selected! Aborting." 1>&2
-#   exit 1
-# fi
