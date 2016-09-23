@@ -93,6 +93,7 @@ $ git checkout some_fix
   ```
 
 ## 3. rsem_pipe.sh
+#TODO: Needs to be updated
 - Bash script that runs RSEM with your aligner of choice (can be specified
   in the script). Requires you to run rsem_make_reference.sh and
   make_pbs_mapping_table.sh before. Should be submitted as pbs job via
