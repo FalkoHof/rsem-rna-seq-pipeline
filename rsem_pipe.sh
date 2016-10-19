@@ -127,9 +127,11 @@ if [ $run_rsem -eq 1 ]; then
       echo "Command exectuted for converting bam to fastq:\n $bedtools_params"
       eval $bedtools_params #run the command
       echo "Converting to fastq... Done"
+      ;;
     "fq")
       echo "File type fastq. No conversion necessary..."
       # do nothing...
+      ;;
     *) #exit when unexpected input is encountered
       error_exit "Error: wrong paramter for file type selected! Select bam or fq."
       ;;
@@ -210,6 +212,7 @@ if [ $run_rsem -eq 1 ]; then
   case $seq_type in
     "PE")
       rsem_opts=$rsem_opts"--paired-end $fq1 $fq2"
+      ;;
     "SE")
       rsem_opts=$rsem_opts"$fq"
       ;;
