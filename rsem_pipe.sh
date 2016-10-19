@@ -161,7 +161,7 @@ if [ $run_rsem -eq 1 ]; then
       trim_params="No trimming selected..." #Don't trimm
       ;;
     ^[NCAGTncagt]+$) #check if alphabet corresponds to the genetic alphabet
-      if [[ $seq_type == "SE" ; then
+      if [[ $seq_type == "SE" ]]; then
         trimming=$trimming" -a $adaptor_type"
       else
         error_exit "Error: Wrong paramter for adaptor or seq type selected!" \
@@ -169,7 +169,7 @@ if [ $run_rsem -eq 1 ]; then
       fi
       ;;
     ^[NCAGTncagt\/]+$) #check if alphabet corresponds to the genetic alphabet
-      if [[ $seq_type == "PE" ; then
+      if [[ $seq_type == "PE" ]]; then
         seqs=(${adaptor_type//\// })
         trimming=$trimming" -a ${seqs[0]} -a2 ${seqs[1]}"
       else
