@@ -144,7 +144,7 @@ if [ $run_rsem -eq 1 ]; then
   if [[ "${#f[@]}" -gt "0" ]]; then
     gunzip ${f[@]}
   fi
-  f=($(ls $sample_dir| grep -e ".fq\|.fastq"))
+    f=($(ls $sample_dir| grep -e ".fq\|.fastq"))
 
   trim_params="trim_galore --dont_gzip --stringency 4 -o $sample_dir"
   case $adaptor_type in
@@ -189,9 +189,9 @@ if [ $run_rsem -eq 1 ]; then
   case $seq_type in
     "PE")
       trim_params=$trim_params" --paired" \
-        " $sample_dir/${f%.*}.1.fq $sample_dir/${f%.*}.2.fq"
-      fq1=$sample_dir/${f%.*}.1_val_1.fq
-      fq1=$sample_dir/${f%.*}.2_val_2.fq
+        " $sample_dir/${f[0]%.*}.1.fq $sample_dir/${f[1]%.*}.2.fq"
+      fq1=$sample_dir/${f[0]%.*}.1_val_1.fq
+      fq1=$sample_dir/${f[1]%.*}.2_val_2.fq
       ;;
     "SE")
       trim_params=$trim_params" $sample_dir/${f%.*}.fq "
