@@ -191,7 +191,7 @@ if [ $run_rsem -eq 1 ]; then
       trim_params=$trim_params" --paired" \
         " $sample_dir/${f[0]%.*}.1.fq $sample_dir/${f[1]%.*}.2.fq"
       fq1=$sample_dir/${f[0]%.*}.1_val_1.fq
-      fq1=$sample_dir/${f[1]%.*}.2_val_2.fq
+      fq2=$sample_dir/${f[1]%.*}.2_val_2.fq
       ;;
     "SE")
       trim_params=$trim_params" $sample_dir/${f%.*}.fq "
@@ -203,7 +203,7 @@ if [ $run_rsem -eq 1 ]; then
       ;;
   esac
   #print the command to be exectuted
-  echo "Command exectuted for adaptor trimming:\n $trim_params"
+  echo "Command exectuted for adaptor trimming:" \n "$trim_params"
   if [[ $adaptor_type != "none" ]]; then
     eval "$trim_params" #run the command
   fi
