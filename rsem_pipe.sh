@@ -188,13 +188,12 @@ if [ $run_rsem -eq 1 ]; then
   fq=""
   case $seq_type in
     "PE")
-      trim_params=$trim_params" --paired" \
-        " $sample_dir/${f[0]%.*}.1.fq $sample_dir/${f[1]%.*}.2.fq"
+      trim_params=$trim_params" --paired $sample_dir/${f[0]} $sample_dir/${f[1]}"
       fq1=$sample_dir/${f[0]%.*}.1_val_1.fq
       fq2=$sample_dir/${f[1]%.*}.2_val_2.fq
       ;;
     "SE")
-      trim_params=$trim_params" $sample_dir/${f%.*}.fq "
+      trim_params=$trim_params" $sample_dir/$f"
       fq=$sample_dir/${f%.*}_trimmed.fq
       ;;
     *) #exit when unexpected input is encountered
