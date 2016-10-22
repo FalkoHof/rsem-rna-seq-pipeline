@@ -39,11 +39,9 @@ pbs_mapping_file=$pipe_dir/pbs_mapping_file.txt
 temp_dir=$base_dir/temp
 
 #####loading of the required modules #####
-module load RSEM/1.2.30-foss-2016a
 module load BEDTools/v2.17.0-goolf-1.4.10
 module load SAMtools/1.3-foss-2015b
 #module load cutadapt/1.9.1-foss-2016a-Python-2.7.11
-module load Trim_Galore/0.4.1-foss-2015a
 #nextera_r1="CTGTCTCTTATACACATCTCCGAGCCCACGAGAC"
 #nextera_r2="CTGTCTCTTATACACATCTGACGCTGCCGACGA"
 
@@ -201,7 +199,9 @@ if [ $run_rsem -eq 1 ]; then
         "See documentation for valid types"
       ;;
   esac
+  #load module
   #print the command to be exectuted
+  module load Trim_Galore/0.4.1-foss-2015a
   echo "Command exectuted for adaptor trimming:" \n "$trim_params"
   if [[ $adaptor_type != "none" ]]; then
     eval "$trim_params" #run the command
@@ -227,23 +227,25 @@ if [ $run_rsem -eq 1 ]; then
   # --seed 12345 set seed for reproducibility of rng
   # --calc-ci calcutates 95% confidence interval of the expression values
   # --ci-memory 30000 set memory
-  rsem_params="--$aligner" \
-    " --num-threads $threads" \
-    " --temporary-folder $temp_dir_s" \
-    " --append-names" \
-    " --estimate-rspd" \
-    " --output-genome-bam" \
-    " --sort-bam-by-coordinate" \
-    " --seed 12345" \
-    " --calc-ci" \
-    " --ci-memory 40000" \
-    " $rsem_opts" \
-    " $rsem_ref" \
-    " $sample_name"
+  rsem_params= --$aligner \
+    --num-threads $threads \
+    --temporary-folder $temp_dir_s \
+    --append-names \
+    --estimate-rspd \
+    --output-genome-bam \
+    --sort-bam-by-coordinate \
+    --seed 12345 \
+    --calc-ci \
+    --ci-memory 40000 \
+    $rsem_opts \
+    $rsem_ref \
+    $sample_name
 
   cd $sample_dir/rsem/
   mkdir -p $sample_dir/rsem/
   #rsem command that should be run
+  #load module
+  module load RSEM/1.2.30-foss-2016a
   echo "rsem-calculate-expression $rsem_params >& $sample_name.log"
   eval "rsem-calculate-expression $rsem_params >& $sample_name.log"
 fi
