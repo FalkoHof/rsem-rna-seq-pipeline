@@ -205,7 +205,7 @@ if [ $run_rsem -eq 1 ]; then
   module load Trim_Galore/0.4.1-foss-2015a
   echo "Command exectuted for adaptor trimming:" \n "$trim_params"
   if [[ $adaptor_type != "none" ]]; then
-    eval "$trim_params" #run the command
+    #eval "$trim_params" #run the command
   fi
 
   rsem_opts=""
@@ -228,16 +228,16 @@ if [ $run_rsem -eq 1 ]; then
   # --seed 12345 set seed for reproducibility of rng
   # --calc-ci calcutates 95% confidence interval of the expression values
   # --ci-memory 30000 set memory
-  rsem_params= --$aligner \
-    --num-threads $threads \
-    --temporary-folder $temp_dir_s \
-    --append-names \
-    --estimate-rspd \
-    --output-genome-bam \
-    --sort-bam-by-coordinate \
-    --seed 12345 \
-    --calc-ci \
-    --ci-memory 40000 \
+  rsem_params=" --$aligner " \
+    "--num-threads $threads " \
+    "--temporary-folder $temp_dir_s " \
+    "--append-names " \
+    "--estimate-rspd " \
+    "--output-genome-bam " \
+    "--sort-bam-by-coordinate " \
+    "--seed 12345 " \
+    "--calc-ci " \
+    "--ci-memory 40000 " \
     $rsem_opts \
     $rsem_ref \
     $sample_name
