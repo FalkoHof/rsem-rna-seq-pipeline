@@ -33,7 +33,7 @@ base_dir=/lustre/scratch/users/$USER/rna_seq
 #folder for rsem reference
 rsem_ref_dir=/lustre/scratch/users/$USER/indices/rsem/$aligner/nod_v01
 #add folder basename as prefix (follows convention from rsem_make_reference)
-rsem_ref=$rsem_ref_dir/$(basename $rsem_ref_dir)
+rsem_ref=$rsem_ref_dir/$(basename "$rsem_ref_dir")
 #location of the mapping file for the array job
 pbs_mapping_file=$pipe_dir/pbs_mapping_file.txt
 #super folder of the temp dir, script will create subfolders with $sample_name
@@ -42,9 +42,6 @@ temp_dir=$base_dir/temp
 #####loading of the required modules #####
 module load BEDTools/v2.17.0-goolf-1.4.10
 module load SAMtools/1.3-foss-2015b
-#module load cutadapt/1.9.1-foss-2016a-Python-2.7.11
-#nextera_r1="CTGTCTCTTATACACATCTCCGAGCCCACGAGAC"
-#nextera_r2="CTGTCTCTTATACACATCTGACGCTGCCGACGA"
 
 # conditional loading of modules based on aligner to be used by RSEM
 if [ $aligner == "bowtie" ]; then
@@ -72,7 +69,7 @@ sample_name=`basename $sample_dir` #get the base name of the dir as sample name
 
 #print some output for logging
 echo '#########################################################################'
-echo 'Starting RSEM RNA-seq pipeline for: '$sample_name
+echo 'Starting RSEM RNA-seq pipeline for: ' $sample_name
 echo 'Sample directory: ' $sample_dir
 echo 'Rsem reference: ' $rsem_ref
 echo 'Aligner to be used: ' $aligner
@@ -141,7 +138,7 @@ if [ $run_rsem -eq 1 ]; then
   f=($(ls $sample_dir | grep -e ".fq.gz\|.fastq.gz"))
   #check if more than 0 zipped files are present, if so unzip
   if [[ "${#f[@]}" -gt "0" ]]; then
-    gunzip ${f[@]}
+    gunzip "${f[@]}"
   fi
     f=($(ls $sample_dir| grep -e ".fq\|.fastq"))
 
@@ -163,8 +160,8 @@ if [ $run_rsem -eq 1 ]; then
       if [[ $seq_type == "SE" ]]; then
         trimming=$trimming" -a $adaptor_type"
       else
-        error_exit "Error: Wrong paramter for adaptor or seq type selected!" \
-          "See documentation for valid types"
+        error_exit "Error: Wrong paramter for adaptor or seq type selected! \
+          See documentation for valid types"
       fi
       ;;
     ^[NCAGTncagt\/]+$) #check if alphabet corresponds to the genetic alphabet
@@ -172,13 +169,13 @@ if [ $run_rsem -eq 1 ]; then
         seqs=(${adaptor_type//\// })
         trimming=$trimming" -a ${seqs[0]} -a2 ${seqs[1]}"
       else
-        error_exit "Error: Wrong paramter for adaptor or seq type selected!" \
-          "See documentation for valid types"
+        error_exit "Error: Wrong paramter for adaptor or seq type selected! \
+          See documentation for valid types"
       fi
       ;;
     *) #exit when unexpected input is encountered
-      error_exit "Error: Wrong paramter for adaptor type selected!" \
-        "See documentation for valid types"
+      error_exit "Error: Wrong paramter for adaptor type selected! \
+        See documentation for valid types"
       ;;
   esac
 
@@ -196,8 +193,8 @@ if [ $run_rsem -eq 1 ]; then
       fq=$sample_dir/${f%.*}_trimmed.fq
       ;;
     *) #exit when unexpected input is encountered
-      error_exit "Error: Wrong paramter for seq type selected!" \
-        "See documentation for valid types"
+      error_exit "Error: Wrong paramter for seq type selected! \
+        See documentation for valid types"
       ;;
   esac
   #load module
@@ -228,27 +225,26 @@ if [ $run_rsem -eq 1 ]; then
   # --seed 12345 set seed for reproducibility of rng
   # --calc-ci calcutates 95% confidence interval of the expression values
   # --ci-memory 30000 set memory
-  rsem_params=" --$aligner " \
-    "--num-threads $threads " \
-    "--temporary-folder $temp_dir_s " \
-    "--append-names " \
-    "--estimate-rspd " \
-    "--output-genome-bam " \
-    "--sort-bam-by-coordinate " \
-    "--seed 12345 " \
-    "--calc-ci " \
-    "--ci-memory 40000 " \
-    $rsem_opts \
-    $rsem_ref \
-    $sample_name
+  rsem_params=--$aligner \
+    --num-threads $threads \
+    --temporary-folder $temp_dir_s \
+    --append-names \
+    --estimate-rspd \
+    --output-genome-bam \
+    --sort-bam-by-coordinate \
+    --seed 12345 \
+    --calc-ci \
+    --ci-memory 40000
+
+  rsem_cmds=$rsem_params $rsem_opts $rsem_ref $sample_name
 
   cd $sample_dir/rsem/
   mkdir -p $sample_dir/rsem/
   #rsem command that should be run
   #load module
   module load RSEM/1.2.30-foss-2016a
-  echo "rsem-calculate-expression $rsem_params >& $sample_name.log"
-  eval "rsem-calculate-expression $rsem_params >& $sample_name.log"
+  echo "rsem-calculate-expression $rsem_cmds >& $sample_name.log"
+  eval "rsem-calculate-expression $rsem_cmds >& $sample_name.log"
 fi
 
 #run the rsem plot function
