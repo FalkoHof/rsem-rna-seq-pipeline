@@ -15,7 +15,7 @@ do
   seq_type=""
   check_for_bam="no"
 
-  fq=($(ls $d | grep -e ".fq.gz\|.fastq.gz|.fq\|.fastq")) #grep all fq files
+  fq=($(ls $d | grep -e ".fq.gz\|.fastq.gz\|.fq\|.fastq")) #grep all fq files
   #some sanity checking...
   if [[ "${#fq[@]}" -gt "2" ]]; then
     echo "Warning! More than 2 fq files found! Skipping... Check path $d" >&2
