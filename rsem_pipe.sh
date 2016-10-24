@@ -13,6 +13,7 @@
 # === begin ENVIRONMENT SETUP ===
 ####set to 0 (false) or 1 (true) to let the repsective code block run
 #1. run rsem
+#TODO: add cycle control to the script
 trim_adaptors=1
 run_rsem=1
 #2. make plots or not
