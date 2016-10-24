@@ -13,15 +13,15 @@
 # === begin ENVIRONMENT SETUP ===
 ####set to 0 (false) or 1 (true) to let the repsective code block run
 #1. run rsem
-#TODO: add cycle control to the script
+#TODO: add conditional adaptor trimming
 #1. trim adaptors
-trim_adaptors=1
+#trim_adaptors=1
 #2. run rsem
 run_rsem=1
 #3. make plots or not
 make_plots=1
 #4. delete unecessary files from temp_dir
-clean=1
+clean=0
 ##### specify RSEM parameters
 aligner=star
 threads=8 #set this to the number of available cores
@@ -43,16 +43,6 @@ temp_dir=$base_dir/temp
 module load BEDTools/v2.17.0-goolf-1.4.10
 module load SAMtools/1.3-foss-2015b
 
-# conditional loading of modules based on aligner to be used by RSEM
-if [ "$aligner" == "bowtie" ]; then
-  module load Bowtie/1.1.2-foss-2015b
-fi
-if [ "$aligner" == "bowtie2" ]; then
-  module load Bowtie2/2.2.7-foss-2015b
-fi
-if [ "$aligner" == "star" ]; then
-  module load rna-star/2.5.2a-foss-2016a
-fi
 if [ $make_plots -eq 1 ]; then
   module load R/3.2.3-foss-2016a
 fi
@@ -93,10 +83,8 @@ cd $sample_dir
 temp_dir_s=$temp_dir/$sample_name
 mkdir -p $temp_dir_s
 
-if [ $trim_adaptors -eq 1 ]; then
-  samples_trimmed=$sample_dir/trimmed
-  mkdir -p $samples_trimmed
-fi
+samples_trimmed=$sample_dir/trimmed
+mkdir -p $samples_trimmed
 
 if [ $run_rsem -eq 1 ]; then
   #1. check file typ and convert to fastq
@@ -137,15 +125,15 @@ if [ $run_rsem -eq 1 ]; then
       ;;
   esac
 
-#2. do adaptor trimming according to seq_type and adaptor_type
+  #2. do adaptor trimming according to seq_type and adaptor_type
   #get the zipped files
   f=($(ls $sample_dir | grep -e ".fq.gz\|.fastq.gz"))
   #check if more than 0 zipped files are present, if so unzip
   if [[ "${#f[@]}" -gt "0" ]]; then
     gunzip "${f[@]}"
   fi
-  f=($(ls $sample_dir| grep -e ".fq\|.fastq"))
 
+  f=($(ls $sample_dir| grep -e ".fq\|.fastq"))
   trim_params="trim_galore --dont_gzip --stringency 4 -o $samples_trimmed"
   case $adaptor_type in
     "nextera")
@@ -189,13 +177,16 @@ if [ $run_rsem -eq 1 ]; then
   case $seq_type in
     "PE")
       trim_params=$trim_params" --paired $sample_dir/${f[0]} $sample_dir/${f[1]}"
-      fq1=$sample_dir/$samples_trimmed/${f[0]%.*}1_val_1.fq
-      fq2=$sample_dir/$samples_trimmed/${f[1]%.*}2_val_2.fq
+      #fq1=$sample_dir/$samples_trimmed/${f[0]%.*}1_val_1.fq
+      #fq2=$sample_dir/$samples_trimmed/${f[1]%.*}2_val_2.fq
+      fq1=$samples_trimmed/${f[0]%.*}1_val_1.fq
+      fq2=$samples_trimmed/${f[1]%.*}2_val_2.fq
       ;;
     "SE")
       trim_params=$trim_params" $sample_dir/$f"
       #TODO: check if the file name is correct like this.
-      fq=$sample_dir/$samples_trimmed/${f%.*}_trimmed.fq
+      #fq=$sample_dir/$samples_trimmed/${f%.*}_trimmed.fq
+      fq=$samples_trimmed/${f%.*}_trimmed.fq
       ;;
     *) #exit when unexpected input is encountered
       error_exit "Error: Wrong paramter for seq type selected! \
@@ -249,9 +240,18 @@ if [ $run_rsem -eq 1 ]; then
 
   cd $sample_dir/rsem/
   mkdir -p $sample_dir/rsem/
-  #rsem command that should be run
-  #load module
+  # conditional loading of modules based on aligner to be used by RSEM
+  if [ "$aligner" == "bowtie" ]; then
+    module load Bowtie/1.1.2-foss-2015b
+  fi
+  if [ "$aligner" == "bowtie2" ]; then
+    module load Bowtie2/2.2.7-foss-2015b
+  fi
+  if [ "$aligner" == "star" ]; then
+    module load rna-star/2.5.2a-foss-2016a
+  fi
   module load RSEM/1.2.30-foss-2016a
+  #rsem command that should be run
   echo "rsem-calculate-expression $rsem_params >& $sample_name.log"
   eval "rsem-calculate-expression $rsem_params >& $sample_name.log"
 fi
