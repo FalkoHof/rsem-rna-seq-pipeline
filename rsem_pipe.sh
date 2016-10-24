@@ -202,11 +202,11 @@ if [ $run_rsem -eq 1 ]; then
   esac
   #load module
   #print the command to be exectuted
-  module load Trim_Galore/0.4.1-foss-2015a
-  echo "Command exectuted for adaptor trimming:" \n "$trim_params"
-  if [[ $adaptor_type != "none" ]]; then
-    #eval "$trim_params" #run the command
-  fi
+  # module load Trim_Galore/0.4.1-foss-2015a
+  # echo "Command exectuted for adaptor trimming:" \n "$trim_params"
+  # if [[ $adaptor_type != "none" ]]; then
+  #   eval "$trim_params" #run the command
+  # fi
 
   rsem_opts=""
   case $seq_type in
