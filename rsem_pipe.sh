@@ -14,12 +14,14 @@
 ####set to 0 (false) or 1 (true) to let the repsective code block run
 #1. run rsem
 #TODO: add cycle control to the script
+#1. trim adaptors
 trim_adaptors=1
+#2. run rsem
 run_rsem=1
-#2. make plots or not
-make_plots=0
-#3. delete unecessary files from temp_dir
-clean=0
+#3. make plots or not
+make_plots=1
+#4. delete unecessary files from temp_dir
+clean=1
 ##### specify RSEM parameters
 aligner=star
 threads=8 #set this to the number of available cores
@@ -192,7 +194,8 @@ if [ $run_rsem -eq 1 ]; then
       ;;
     "SE")
       trim_params=$trim_params" $sample_dir/$f"
-      fq=$sample_dir/${f%.*}_trimmed.fq
+      #TODO: check if the file name is correct like this.
+      fq=$sample_dir/$samples_trimmed/${f%.*}_trimmed.fq
       ;;
     *) #exit when unexpected input is encountered
       error_exit "Error: Wrong paramter for seq type selected! \
@@ -264,6 +267,7 @@ if [ $clean -eq 1 ]; then
   rm $sample_dir/${f%.*}.sorted.bam
   rm $sample_dir/rsem/*.transcript.bam
   rm -rf $temp_dir_s
+  rm -rf $samples_trimmed
 fi
 
 echo 'Finished RSEM RNA-seq pipeline for: '$sample_name
