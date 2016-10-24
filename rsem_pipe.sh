@@ -21,9 +21,7 @@ make_plots=0
 #3. delete unecessary files from temp_dir
 clean=0
 ##### specify RSEM parameters
-aligner="star"
-#seq_mode="PE"
-#file_type="fastq"
+aligner=star
 threads=8 #set this to the number of available cores
 ##### specify folders and variables #####
 #set script dir
@@ -44,13 +42,13 @@ module load BEDTools/v2.17.0-goolf-1.4.10
 module load SAMtools/1.3-foss-2015b
 
 # conditional loading of modules based on aligner to be used by RSEM
-if [ $aligner == "bowtie" ]; then
+if [ "$aligner" == "bowtie" ]; then
   module load Bowtie/1.1.2-foss-2015b
 fi
-if [ $aligner == "bowtie2" ]; then
+if [ "$aligner" == "bowtie2" ]; then
   module load Bowtie2/2.2.7-foss-2015b
 fi
-if [ $aligner == "star" ]; then
+if [ "$aligner" == "star" ]; then
   module load rna-star/2.5.2a-foss-2016a
 fi
 if [ $make_plots -eq 1 ]; then
@@ -225,26 +223,30 @@ if [ $run_rsem -eq 1 ]; then
   # --seed 12345 set seed for reproducibility of rng
   # --calc-ci calcutates 95% confidence interval of the expression values
   # --ci-memory 30000 set memory
-  rsem_params=--$aligner \
-    --num-threads $threads \
-    --temporary-folder $temp_dir_s \
-    --append-names \
-    --estimate-rspd \
-    --output-genome-bam \
-    --sort-bam-by-coordinate \
-    --seed 12345 \
-    --calc-ci \
-    --ci-memory 40000
+  rsem_params="--$aligner \
+  --num-threads $threads \
+  --temporary-folder $temp_dir_s \
+  --append-names \
+  --estimate-rspd \
+  --output-genome-bam \
+  --sort-bam-by-coordinate \
+  --seed 12345 \
+  --calc-ci \
+  --ci-memory 40000"
 
-  rsem_cmds=$rsem_params $rsem_opts $rsem_ref $sample_name
+  rsem_params+=" "$rsem_opts
+  rsem_params+=" "$rsem_ref
+  rsem_params+=" "$sample_name
+
+  #sem_cmds=$rsem_params $rsem_opts $rsem_ref $sample_name
 
   cd $sample_dir/rsem/
   mkdir -p $sample_dir/rsem/
   #rsem command that should be run
   #load module
   module load RSEM/1.2.30-foss-2016a
-  echo "rsem-calculate-expression $rsem_cmds >& $sample_name.log"
-  eval "rsem-calculate-expression $rsem_cmds >& $sample_name.log"
+  echo "rsem-calculate-expression $rsem_params >& $sample_name.log"
+  eval "rsem-calculate-expression $rsem_params >& $sample_name.log"
 fi
 
 #run the rsem plot function
