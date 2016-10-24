@@ -180,8 +180,8 @@ if [ $run_rsem -eq 1 ]; then
       trim_params=$trim_params" --paired $sample_dir/${f[0]} $sample_dir/${f[1]}"
       #fq1=$sample_dir/$samples_trimmed/${f[0]%.*}1_val_1.fq
       #fq2=$sample_dir/$samples_trimmed/${f[1]%.*}2_val_2.fq
-      fq1=$samples_trimmed/${f[0]%.*}1_val_1.fq
-      fq2=$samples_trimmed/${f[1]%.*}2_val_2.fq
+      fq1=$samples_trimmed/${f[0]%.*}_val_1.fq
+      fq2=$samples_trimmed/${f[1]%.*}_val_2.fq
       ;;
     "SE")
       trim_params=$trim_params" $sample_dir/$f"
