@@ -39,9 +39,6 @@ pbs_mapping_file=$pipe_dir/pbs_mapping_file.txt
 #super folder of the temp dir, script will create subfolders with $sample_name
 temp_dir=$base_dir/temp
 
-#####loading of the required modules #####
-module load BEDTools/v2.17.0-goolf-1.4.10
-module load SAMtools/1.3-foss-2015b
 
 if [ $make_plots -eq 1 ]; then
   module load R/3.2.3-foss-2016a
@@ -96,6 +93,10 @@ if [ $run_rsem -eq 1 ]; then
       if [[ "${#f[@]}" -ne "1" ]]; then
         error_exit "Error: wrong number of bam files in folder. Files present: ${#f[@]}"
       fi
+      #load modules
+      module load BEDTools/v2.17.0-goolf-1.4.10
+      module load SAMtools/1.3-foss-2015b
+
       samtools sort -n -m 4G -@ $threads -o $sample_dir/${f%.*}.sorted.bam \
         $sample_dir/$f
       bedtools_params="bedtools bamtofastq -i $sample_dir/${f%.*}.sorted.bam "
