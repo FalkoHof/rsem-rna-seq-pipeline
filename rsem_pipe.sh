@@ -91,6 +91,10 @@ cd $sample_dir
 temp_dir_s=$temp_dir/$sample_name
 mkdir -p $temp_dir_s
 
+if [ $trim_adaptors -eq 1 ]; then
+  samples_trimmed=$sample_dir/trimmed
+  mkdir -p $samples_trimmed
+fi
 
 if [ $run_rsem -eq 1 ]; then
   #1. check file typ and convert to fastq
@@ -132,15 +136,15 @@ if [ $run_rsem -eq 1 ]; then
   esac
 
 #2. do adaptor trimming according to seq_type and adaptor_type
-  #ge
+  #get the zipped files
   f=($(ls $sample_dir | grep -e ".fq.gz\|.fastq.gz"))
   #check if more than 0 zipped files are present, if so unzip
   if [[ "${#f[@]}" -gt "0" ]]; then
     gunzip "${f[@]}"
   fi
-    f=($(ls $sample_dir| grep -e ".fq\|.fastq"))
+  f=($(ls $sample_dir| grep -e ".fq\|.fastq"))
 
-  trim_params="trim_galore --dont_gzip --stringency 4 -o $sample_dir"
+  trim_params="trim_galore --dont_gzip --stringency 4 -o $samples_trimmed"
   case $adaptor_type in
     "nextera")
       trimming=$trimming" --nextera"
@@ -183,8 +187,8 @@ if [ $run_rsem -eq 1 ]; then
   case $seq_type in
     "PE")
       trim_params=$trim_params" --paired $sample_dir/${f[0]} $sample_dir/${f[1]}"
-      fq1=$sample_dir/${f[0]%.*}.1_val_1.fq
-      fq2=$sample_dir/${f[1]%.*}.2_val_2.fq
+      fq1=$sample_dir/$samples_trimmed/${f[0]%.*}1_val_1.fq
+      fq2=$sample_dir/$samples_trimmed/${f[1]%.*}2_val_2.fq
       ;;
     "SE")
       trim_params=$trim_params" $sample_dir/$f"
@@ -196,12 +200,12 @@ if [ $run_rsem -eq 1 ]; then
       ;;
   esac
   #load module
+  module load Trim_Galore/0.4.1-foss-2015a
   #print the command to be exectuted
-  # module load Trim_Galore/0.4.1-foss-2015a
-  # echo "Command exectuted for adaptor trimming:" \n "$trim_params"
-  # if [[ $adaptor_type != "none" ]]; then
-  #   eval "$trim_params" #run the command
-  # fi
+  echo "Command exectuted for adaptor trimming:" \n "$trim_params"
+  if [[ $adaptor_type != "none" ]]; then
+     eval "$trim_params" #run the command
+  fi
 
   rsem_opts=""
   case $seq_type in
