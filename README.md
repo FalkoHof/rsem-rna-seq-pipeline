@@ -5,6 +5,7 @@ aligner of choice and quantify the mapped reads via
 
 
 ## Download & general remarks
+------
 To get the scripts run in your folder of choice:
 ```shell
 git clone https://gitlab.com/nodine-lab/rsem-rna-seq-pipeline.git
@@ -14,10 +15,10 @@ The most recent updates are contained in the development branch. To make use of 
 git fetch origin develop
 git checkout develop
 ```
-However this branch is always under active development there is of course a chance that you might into not yet discovered bugs/problems.
+However this branch is always under active development. This means there is of course a chance that you might into not yet discovered bugs/problems.
 
 ## Setup & howto
-
+------
 This pipeline contains a collection of three scripts that should be run in the
 following order:
 1. rsem_make_reference.sh -  a script to build an rsem index
