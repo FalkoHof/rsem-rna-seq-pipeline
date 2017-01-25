@@ -147,6 +147,7 @@ if [ $run_rsem -eq 1 ]; then
       #do nothing == autodetect
       ;;
     "none")
+      #FIXME this will cause the pipeline to crash atm.
       trim_params="No trimming selected..." #Don't trimm
       ;;
     ^[NCAGTncagt]+$) #check if alphabet corresponds to the genetic alphabet
