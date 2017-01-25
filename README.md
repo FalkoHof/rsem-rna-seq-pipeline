@@ -3,16 +3,27 @@ This repository contains a collections of scripts to map RNA-seq data via your
 aligner of choice and quantify the mapped reads via
 [RSEM](https://github.com/deweylab/RSEM).
 
+
+## Download & general remarks
 To get the scripts run in your folder of choice:
 ```shell
 git clone https://gitlab.com/nodine-lab/rsem-rna-seq-pipeline.git
 ```
+The most recent updates are contained in the development branch. To make use of most recent version run after you have cloned the repository:
+```shell
+git fetch origin develop
+git checkout develop
+```
+However this branch is always under active development there is of course a chance that you might into not yet discovered bugs/problems.
+
+## Setup & howto
+
 This pipeline contains a collection of three scripts that should be run in the
 following order:
 1. rsem_make_reference.sh -  a script to build an rsem index
 2. make_pbs_mapping_table.sh - a script for creating a mapping table to tell
    rsem_pipe.sh which files/folders should be processed
-3. rsem_pipe.sh - the pipeline script to align and quantify rna seq data.
+3. rsem_pipe.sh - the pipeline script to align and quantify RNA-seq data.
 
 If you are lab member and want to hack around on the pipeline and create your
 own customized pipelines either
@@ -24,7 +35,7 @@ $ git branch some_fix
 $ git checkout some_fix
 ```
 
-## 1. rsem_make_reference.sh
+### 1. rsem_make_reference.sh
 - A bash script to create an RSEM reference for a certain aligner with a certain
   annotation and fasta file. Edit according to need and preferences (e.g.
   preferred aligner, annotation file format, fasta file location). This script
@@ -49,7 +60,7 @@ $ git checkout some_fix
   - out_dir: specify here the folder where the rsem reference should be stored
     at. Defaults to: '/lustre/scratch/users/$USER/indices/rsem/$aligner/nod_v01'
 
-## 2. make_pbs_mapping_table.sh
+### 2. make_pbs_mapping_table.sh
 - Bash script to create a mapping file for pbs array jobs. Should be run via the
   standard shell environment and needs an folder as command line argument.
   The script will list the subfolders and output a mapping of
@@ -57,7 +68,8 @@ $ git checkout some_fix
   file in the rsem_pipe.sh script. The idea here is that you don't manually need
   to type in sample names when you want to submit a batch job. Just input the
   super folder of all your samples as command line argument.
-  ```
+
+  ```shell
   example: ./make_pbs_mapping_table.sh /Some/Super/Folders/ > pbs_mapping_file.txt
   ```
 - Afterwards I would recommend to briefly check if the paths in the
@@ -75,7 +87,7 @@ $ git checkout some_fix
   ...
   ```
 
-## 3. rsem_pipe.sh
+### 3. rsem_pipe.sh
 - Bash script that runs RSEM with your aligner of choice (can be specified
   in the script). Requires you to run rsem_make_reference.sh and
   make_pbs_mapping_table.sh before. Should be submitted as pbs job via
