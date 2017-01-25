@@ -17,6 +17,7 @@ git checkout develop
 ```
 However this branch is always under active development. This means there is of course a chance that you might into not yet discovered bugs/problems.
 
+
 ## Setup & howto
 ------
 This pipeline contains a collection of three scripts that should be run in the
@@ -35,6 +36,7 @@ the repository (prefered for customization) or create a seperate [branch](https:
 $ git branch some_fix
 $ git checkout some_fix
 ```
+
 
 ### 1. rsem_make_reference.sh
 - A bash script to create an RSEM reference for a certain aligner with a certain
