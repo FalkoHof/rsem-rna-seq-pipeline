@@ -14,6 +14,13 @@ following order:
    rsem_pipe.sh which files/folders should be processed
 3. rsem_pipe.sh - the pipeline script to align and quantify rna seq data.
 
+The most recent updates are contained in the development branch. To make use of most recent version run after you have cloned the repository:
+```shell
+git fetch origin develop 
+git checkout develop
+```
+This will make git fetch the contents of the development branch and switch to it.  
+
 If you are lab member and want to hack around on the pipeline and create your
 own customized pipelines either
 [fork](https://help.github.com/articles/fork-a-repo/)
