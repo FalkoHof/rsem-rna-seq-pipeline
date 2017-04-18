@@ -239,8 +239,8 @@ if [ $run_rsem -eq 1 ]; then
     " $rsem_ref" \
     " $sample_name"
 
-  cd $sample_dir/rsem/
   mkdir -p $sample_dir/rsem/
+  cd $sample_dir/rsem/
   #rsem command that should be run
   echo "rsem-calculate-expression $rsem_params >& $sample_name.log"
   eval "rsem-calculate-expression $rsem_params >& $sample_name.log"
