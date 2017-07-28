@@ -7,6 +7,7 @@
 #PBS -o /lustre/scratch/users/falko.hofmann/log/160705_rsem/rsem-rna_^array_index^_mapping.log
 #PBS -l walltime=24:00:00
 #PBS -l select=1:ncpus=8:mem=48gb
+
 # === begin ENVIRONMENT SETUP ===
 ####set to 0 (false) or 1 (true) to let the repsective code block run
 #1. run rsem
@@ -14,12 +15,12 @@ run_rsem=1
 #2. make plots or not
 make_plots=1
 #3. delete unecessary files from temp_dir
-clean=1
+clean=0
+
 ##### specify RSEM parameters
 aligner="star"
-#seq_mode="PE"
-#file_type="fastq"
 threads=8 #set this to the number of available cores
+
 ##### specify folders and variables #####
 #set script dir
 pipe_dir=/lustre/scratch/users/$USER/pipelines/rsem-rna-seq-pipeline
@@ -51,6 +52,7 @@ fi
 if [ $make_plots -eq 1 ]; then
   module load R/3.2.3-foss-2016a
 fi
+
 ##### Obtain Parameters from mapping file using $PBS_ARRAY_INDEX as line number
 input_mapper=`sed -n "${PBS_ARRAY_INDEX} p" $pbs_mapping_file` #read mapping file
 names_mapped=($input_mapper)
