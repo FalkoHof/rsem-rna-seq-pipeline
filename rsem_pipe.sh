@@ -127,7 +127,7 @@ if [ $run_rsem -eq 1 ]; then
   esac
 
 #2. do adaptor trimming according to seq_type and adaptor_type
-  #ge
+  #get the fastq files present in the sample_dir
   f=($(ls $sample_dir | grep -e ".fq.gz\|.fastq.gz"))
   #check if more than 0 zipped files are present, if so unzip
   if [[ "${#f[@]}" -gt "0" ]]; then
