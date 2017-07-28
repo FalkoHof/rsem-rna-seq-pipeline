@@ -13,7 +13,6 @@
 # === begin ENVIRONMENT SETUP ===
 ####set to 0 (false) or 1 (true) to let the repsective code block run
 #1. run rsem
-trim_adaptors=1
 run_rsem=1
 #2. make plots or not
 make_plots=0
@@ -27,8 +26,6 @@ threads=8 #set this to the number of available cores
 ##### specify folders and variables #####
 #set script dir
 pipe_dir=/lustre/scratch/users/$USER/pipelines/rsem-rna-seq-pipeline
-#set ouput base dir
-base_dir=/lustre/scratch/users/$USER/rna_seq
 #folder for rsem reference
 rsem_ref_dir=/lustre/scratch/users/$USER/indices/rsem/$aligner/nod_v01
 #add folder basename as prefix (follows convention from rsem_make_reference)
@@ -36,23 +33,20 @@ rsem_ref=$rsem_ref_dir/$(basename $rsem_ref_dir)
 #location of the mapping file for the array job
 pbs_mapping_file=$pipe_dir/pbs_mapping_file.txt
 #super folder of the temp dir, script will create subfolders with $sample_name
-temp_dir=$base_dir/temp
+temp_dir=/lustre/scratch/users/$USER/temp
 
 #####loading of the required modules #####
-module load RSEM/1.2.30-foss-2016a
-module load BEDTools/v2.17.0-goolf-1.4.10
-module load SAMtools/1.3-foss-2015b
-#module load cutadapt/1.9.1-foss-2016a-Python-2.7.11
-module load Trim_Galore/0.4.1-foss-2015a
-#nextera_r1="CTGTCTCTTATACACATCTCCGAGCCCACGAGAC"
-#nextera_r2="CTGTCTCTTATACACATCTGACGCTGCCGACGA"
+module load RSEM/1.2.31-foss-2016a
+module load BEDTools/2.26.0-foss-2016a
+module load SAMtools/1.3.1-foss-2016a
+module load Trim_Galore/0.4.1-foss-2016a
 
 # conditional loading of modules based on aligner to be used by RSEM
 if [ $aligner == "bowtie" ]; then
-  module load Bowtie/1.1.2-foss-2015b
+  module load Bowtie/1.1.2-foss-2016a
 fi
 if [ $aligner == "bowtie2" ]; then
-  module load Bowtie2/2.2.7-foss-2015b
+  module load Bowtie2/2.2.9-foss-2016a
 fi
 if [ $aligner == "star" ]; then
   module load rna-star/2.5.2a-foss-2016a
@@ -124,7 +118,7 @@ if [ $run_rsem -eq 1 ]; then
           ;;
       esac
       #print the command to be exectuted
-      echo "Command exectuted for converting bam to fastq:\n $bedtools_params"
+      echo "Command exectuted for converting bam to fastq: $bedtools_params"
       eval $bedtools_params #run the command
       echo "Converting to fastq... Done"
     "fq")
@@ -248,6 +242,7 @@ fi
 
 #run the rsem plot function
 if [ $make_plots -eq 1 ]; then
+  module load R/3.2.3-foss-2016a
   rsem-plot-model $sample_dir/rsem/$sample_name $sample_dir/rsem/$sample_name.pdf
 fi
 
