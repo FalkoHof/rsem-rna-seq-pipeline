@@ -7,17 +7,14 @@
 #PBS -o /lustre/scratch/users/falko.hofmann/log/160705_rsem/rsem-rna_^array_index^_mapping.log
 #PBS -l walltime=24:00:00
 #PBS -l select=1:ncpus=8:mem=48gb
-
-
-#TODO: update README & make the make_pbs_mapping file.
 # === begin ENVIRONMENT SETUP ===
 ####set to 0 (false) or 1 (true) to let the repsective code block run
 #1. run rsem
 run_rsem=1
 #2. make plots or not
-make_plots=0
+make_plots=1
 #3. delete unecessary files from temp_dir
-clean=0
+clean=1
 ##### specify RSEM parameters
 aligner="star"
 #seq_mode="PE"
