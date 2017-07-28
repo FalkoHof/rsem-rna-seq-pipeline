@@ -127,8 +127,10 @@ if [ $run_rsem -eq 1 ]; then
       # run the command
       eval $bedtools_params
       echo "Converting to fastq... Done"
+      ;;
     "fq")
       echo "File type fastq. No conversion necessary..."
+      ;;
       # do nothing...
     *) # exit when unexpected input is encountered
       error_exit "Error: wrong paramter for file type selected! Select bam or fq."
@@ -163,7 +165,7 @@ if [ $run_rsem -eq 1 ]; then
       trim_params="No trimming selected..."
       ;;
     ^[NCAGTncagt]+$) # check if alphabet corresponds to the genetic alphabet
-      if [[ $seq_type == "SE" ; then
+      if [[ $seq_type == "SE" ]]; then
         trimming=$trimming" -a $adaptor_type"
       else
         error_exit "Error: Wrong paramter for adaptor or seq type selected!" \
@@ -171,7 +173,7 @@ if [ $run_rsem -eq 1 ]; then
       fi
       ;;
     ^[NCAGTncagt\/]+$) # check if alphabet corresponds to the genetic alphabet
-      if [[ $seq_type == "PE" ; then
+      if [[ $seq_type == "PE" ]]; then
         seqs=(${adaptor_type//\// })
         trimming=$trimming" -a ${seqs[0]} -a2 ${seqs[1]}"
       else
