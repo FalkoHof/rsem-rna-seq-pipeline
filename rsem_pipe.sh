@@ -216,6 +216,7 @@ if [ $run_rsem -eq 1 ]; then
   case $seq_type in
     "PE")
       rsem_opts=$rsem_opts"--paired-end $fq1 $fq2"
+      ;;
     "SE")
       rsem_opts=$rsem_opts"$fq"
       ;;
@@ -254,7 +255,7 @@ fi
 
 # run the rsem plot function
 if [ $make_plots -eq 1 ]; then
-  rsem-plot-model $sample_dir/rsem/$sample_name $sample_dir/rsem/$sample_name.pdf
+  rsem-plot-model $sample_dir/rsem/$sample_name.stat $sample_dir/rsem/$sample_name.pdf
 fi
 
 # delete the temp files
