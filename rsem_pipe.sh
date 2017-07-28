@@ -10,11 +10,11 @@
 
 # === begin ENVIRONMENT SETUP ===
 ####set to 0 (false) or 1 (true) to let the repsective code block run
-#1. run rsem
+# 1. run rsem
 run_rsem=1
-#2. make plots or not
+# 2. make plots or not
 make_plots=1
-#3. delete unecessary files from temp_dir
+# 3. delete unecessary files from temp_dir
 clean=0
 
 ##### specify RSEM parameters
@@ -22,15 +22,15 @@ aligner="star"
 threads=8 #set this to the number of available cores
 
 ##### specify folders and variables #####
-#set script dir
+# set script dir
 pipe_dir=/lustre/scratch/users/$USER/pipelines/rsem-rna-seq-pipeline
-#folder for rsem reference
+# folder for rsem reference
 rsem_ref_dir=/lustre/scratch/users/$USER/indices/rsem/$aligner/nod_v01
-#add folder basename as prefix (follows convention from rsem_make_reference)
+# add folder basename as prefix (follows convention from rsem_make_reference)
 rsem_ref=$rsem_ref_dir/$(basename $rsem_ref_dir)
-#location of the mapping file for the array job
+# location of the mapping file for the array job
 pbs_mapping_file=$pipe_dir/pbs_mapping_file.txt
-#super folder of the temp dir, script will create subfolders with $sample_name
+# super folder of the temp dir, script will create subfolders with $sample_name
 temp_dir=/lustre/scratch/users/$USER/temp
 
 #####loading of the required modules #####
@@ -76,7 +76,7 @@ echo 'Specified sequencing mode: ' $seq_type
 echo 'Specified adaptor type: ' $adaptor_type
 echo '#########################################################################'
 
-#some error handling function
+# some error handling function
 function error_exit
 {
   echo "$1" 1>&2
@@ -96,48 +96,57 @@ if [ $run_rsem -eq 1 ]; then
   case $file_type in
     "bam")
       echo "File type bam. Converting to fastq..."
-      f=($(ls $sample_dir | grep -e ".bam")) # get all bam files in folder
+      # get all bam files in folder
+      f=($(ls $sample_dir | grep -e ".bam"))
       #throw error if more or less than 1 file is present
       if [[ "${#f[@]}" -ne "1" ]]; then
         error_exit "Error: wrong number of bam files in folder. Files present: ${#f[@]}"
       fi
+      # sort bam file
       samtools sort -n -m 4G -@ $threads -o $sample_dir/${f%.*}.sorted.bam \
         $sample_dir/$f
+      # initilize parameters for bam to fastq conversion
       bedtools_params="bedtools bamtofastq -i $sample_dir/${f%.*}.sorted.bam "
       case $seq_type in
-        "PE") #modify bedtools params for PE conversion
+        "PE")
+          # modify bedtools params for PE conversion
           bedtools_params=$bedtools_params" -fq $sample_dir/${f%.*}.1.fq"\
             " -fq2 $sample_dir/${f%.*}.2.fq"
           ;;
-        "SE") #modify bedtools params for SE conversion
+        "SE")
+          # modify bedtools params for SE conversion
           bedtools_params=$bedtools_params" -fq $sample_dir/${f%.*}.fq"
           ;;
-        *) #exit when unexpected input is encountered
+        *)
+          # exit when unexpected input is encountered
           error_exit "Error: wrong paramter for seq type selected! Select PE or SE."
           ;;
       esac
-      #print the command to be exectuted
+      # print the command to be exectuted
       echo "Command exectuted for converting bam to fastq: $bedtools_params"
-      eval $bedtools_params #run the command
+      # run the command
+      eval $bedtools_params
       echo "Converting to fastq... Done"
     "fq")
       echo "File type fastq. No conversion necessary..."
       # do nothing...
-    *) #exit when unexpected input is encountered
+    *) # exit when unexpected input is encountered
       error_exit "Error: wrong paramter for file type selected! Select bam or fq."
       ;;
   esac
 
 #2. do adaptor trimming according to seq_type and adaptor_type
-  #get the fastq files present in the sample_dir
+  # get gzipped fastq files
   f=($(ls $sample_dir | grep -e ".fq.gz\|.fastq.gz"))
-  #check if more than 0 zipped files are present, if so unzip
+  # check if more than 0 zipped files are present, if so unzip
   if [[ "${#f[@]}" -gt "0" ]]; then
     gunzip ${f[@]}
   fi
+  # get fastq files
   f=($(ls $sample_dir| grep -e ".fq\|.fastq"))
-
+  # start generating the adpator trimming command
   trim_params="trim_galore --dont_gzip --stringency 4 -o $sample_dir"
+  # check which adaptor type is set and adapt command to it
   case $adaptor_type in
     "nextera")
       trimming=$trimming" --nextera"
@@ -145,13 +154,15 @@ if [ $run_rsem -eq 1 ]; then
     "illumina")
       trimming=$trimming" --illumina"
       ;;
-    "unknown") #run trim galore with autodetect
-      #do nothing == autodetect
+    "unknown")
+      # run trim galore with autodetect
+      # do nothing == autodetect
       ;;
     "none")
-      trim_params="No trimming selected..." #Don't trimm
+      # Don't trimm
+      trim_params="No trimming selected..."
       ;;
-    ^[NCAGTncagt]+$) #check if alphabet corresponds to the genetic alphabet
+    ^[NCAGTncagt]+$) # check if alphabet corresponds to the genetic alphabet
       if [[ $seq_type == "SE" ; then
         trimming=$trimming" -a $adaptor_type"
       else
@@ -159,7 +170,7 @@ if [ $run_rsem -eq 1 ]; then
           "See documentation for valid types"
       fi
       ;;
-    ^[NCAGTncagt\/]+$) #check if alphabet corresponds to the genetic alphabet
+    ^[NCAGTncagt\/]+$) # check if alphabet corresponds to the genetic alphabet
       if [[ $seq_type == "PE" ; then
         seqs=(${adaptor_type//\// })
         trimming=$trimming" -a ${seqs[0]} -a2 ${seqs[1]}"
@@ -168,7 +179,7 @@ if [ $run_rsem -eq 1 ]; then
           "See documentation for valid types"
       fi
       ;;
-    *) #exit when unexpected input is encountered
+    *) # exit when unexpected input is encountered
       error_exit "Error: Wrong paramter for adaptor type selected!" \
         "See documentation for valid types"
       ;;
@@ -188,12 +199,12 @@ if [ $run_rsem -eq 1 ]; then
       trim_params=$trim_params" $sample_dir/${f%.*}.fq "
       fq=$sample_dir/${f%.*}_trimmed.fq
       ;;
-    *) #exit when unexpected input is encountered
+    *) # exit when unexpected input is encountered
       error_exit "Error: Wrong paramter for seq type selected!" \
         "See documentation for valid types"
       ;;
   esac
-  #print the command to be exectuted
+  # print the command to be exectuted
   echo "Command exectuted for adaptor trimming:\n $trim_params"
   if [[ $adaptor_type != "none" ]]; then
     eval "$trim_params" #run the command
@@ -206,7 +217,7 @@ if [ $run_rsem -eq 1 ]; then
     "SE")
       rsem_opts=$rsem_opts"$fq"
       ;;
-    *) #exit when unexpected input is encountered
+    *) # exit when unexpected input is encountered
       error_exit "Error: Wrong paramter for seq type selected!" \
         "See documentation for valid types"
       ;;
@@ -234,18 +245,17 @@ if [ $run_rsem -eq 1 ]; then
 
   mkdir -p $sample_dir/rsem/
   cd $sample_dir/rsem/
-  #rsem command that should be run
+  # rsem command that should be run
   echo "rsem-calculate-expression $rsem_params >& $sample_name.log"
   eval "rsem-calculate-expression $rsem_params >& $sample_name.log"
 fi
 
-#run the rsem plot function
+# run the rsem plot function
 if [ $make_plots -eq 1 ]; then
-  module load R/3.2.3-foss-2016a
   rsem-plot-model $sample_dir/rsem/$sample_name $sample_dir/rsem/$sample_name.pdf
 fi
 
-#delete the temp files
+# delete the temp files
 if [ $clean -eq 1 ]; then
   gzip $sample_dir/*.fq $sample_dir/*.fastq
   rm $sample_dir/${f%.*}.sorted.bam
