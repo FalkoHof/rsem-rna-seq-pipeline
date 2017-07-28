@@ -1,10 +1,10 @@
 #!/bin/bash
 #PBS -P rnaseq_nod
 #PBS -N rsem-pipe
-#PBS -J 1-2
+#PBS -J 1-22
 #PBS -j oe
 #PBS -q workq
-#PBS -o /lustre/scratch/users/falko.hofmann/log/160705_rsem/rsem-rna_^array_index^_mapping.log
+#PBS -o /lustre/scratch/users/falko.hofmann/log/170720_ruben/rsem-rna_^array_index^_mapping.log
 #PBS -l walltime=24:00:00
 #PBS -l select=1:ncpus=8:mem=48gb
 
@@ -25,11 +25,11 @@ threads=8 #set this to the number of available cores
 # set script dir
 pipe_dir=/lustre/scratch/users/$USER/pipelines/rsem-rna-seq-pipeline
 # folder for rsem reference
-rsem_ref_dir=/lustre/scratch/users/$USER/indices/rsem/$aligner/nod_v01
+rsem_ref_dir=/lustre/scratch/users/$USER/indices/rsem/$aligner/tair10_33
 # add folder basename as prefix (follows convention from rsem_make_reference)
 rsem_ref=$rsem_ref_dir/$(basename $rsem_ref_dir)
 # location of the mapping file for the array job
-pbs_mapping_file=$pipe_dir/pbs_mapping_file.txt
+pbs_mapping_file=$pipe_dir/mapping_file_ruben.txt
 # super folder of the temp dir, script will create subfolders with $sample_name
 temp_dir=/lustre/scratch/users/$USER/temp
 
