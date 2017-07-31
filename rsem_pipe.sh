@@ -106,12 +106,12 @@ if [ $run_rsem -eq 1 ]; then
       samtools sort -n -m 4G -@ $threads -o $sample_dir/${f%.*}.sorted.bam \
         $sample_dir/$f
       # initilize parameters for bam to fastq conversion
-      bedtools_params="bedtools bamtofastq -i $sample_dir/${f%.*}.sorted.bam "
+      bedtools_params="bedtools bamtofastq -i $sample_dir/${f%.*}.sorted.bam"
       case $seq_type in
         "PE")
           # modify bedtools params for PE conversion
-          bedtools_params=$bedtools_params" -fq $sample_dir/${f%.*}.1.fq"\
-            " -fq2 $sample_dir/${f%.*}.2.fq"
+          bedtools_params=$bedtools_params" -fq $sample_dir/${f%.*}.1.fq\
+            -fq2 $sample_dir/${f%.*}.2.fq"
           ;;
         "SE")
           # modify bedtools params for SE conversion
