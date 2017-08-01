@@ -232,19 +232,19 @@ if [ $run_rsem -eq 1 ]; then
   # --seed 12345 set seed for reproducibility of rng
   # --calc-ci calcutates 95% confidence interval of the expression values
   # --ci-memory 30000 set memory
-  rsem_params="--$aligner" \
-    " --num-threads $threads" \
-    " --temporary-folder $temp_dir_s" \
-    " --append-names" \
-    " --estimate-rspd" \
-    " --output-genome-bam" \
-    " --sort-bam-by-coordinate" \
-    " --seed 12345" \
-    " --calc-ci" \
-    " --ci-memory 40000" \
-    " $rsem_opts" \
-    " $rsem_ref" \
-    " $sample_name"
+  rsem_params="--$aligner\
+    --num-threads $threads\
+    --temporary-folder $temp_dir_s\
+    --append-names\
+    --estimate-rspd\
+    --output-genome-bam\
+    --sort-bam-by-coordinate\
+    --seed 12345\
+    --calc-ci\
+    --ci-memory 40000\
+    $rsem_opts\
+    $rsem_ref\
+    $sample_name"
 
   mkdir -p $sample_dir/rsem/
   cd $sample_dir/rsem/
