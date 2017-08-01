@@ -262,7 +262,7 @@ fi
 # delete the temp files
 if [ $clean -eq 1 ]; then
   gzip $sample_dir/*.fq $sample_dir/*.fastq
-  rm $sample_dir/${f%.*}.sorted.bam
+  rm $sample_dir/*.sorted.bam
   rm $sample_dir/rsem/*.transcript.bam
   rm -rf $temp_dir_s
 fi
