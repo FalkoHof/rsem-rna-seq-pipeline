@@ -151,10 +151,10 @@ if [ $run_rsem -eq 1 ]; then
   # check which adaptor type is set and adapt command to it
   case $adaptor_type in
     "nextera")
-      trimming=$trimming" --nextera"
+      trim_params=$trim_params" --nextera"
       ;;
     "illumina")
-      trimming=$trimming" --illumina"
+      trim_params=$trim_params" --illumina"
       ;;
     "unknown")
       # run trim galore with autodetect
@@ -166,7 +166,7 @@ if [ $run_rsem -eq 1 ]; then
       ;;
     ^[NCAGTncagt]+$) # check if alphabet corresponds to the genetic alphabet
       if [[ $seq_type == "SE" ]]; then
-        trimming=$trimming" -a $adaptor_type"
+        trim_params=$trim_params" -a $adaptor_type"
       else
         error_exit "Error: Wrong paramter for adaptor or seq type selected!" \
           "See documentation for valid types"
@@ -175,7 +175,7 @@ if [ $run_rsem -eq 1 ]; then
     ^[NCAGTncagt\/]+$) # check if alphabet corresponds to the genetic alphabet
       if [[ $seq_type == "PE" ]]; then
         seqs=(${adaptor_type//\// })
-        trimming=$trimming" -a ${seqs[0]} -a2 ${seqs[1]}"
+        trim_params=$trim_params" -a ${seqs[0]} -a2 ${seqs[1]}"
       else
         error_exit "Error: Wrong paramter for adaptor or seq type selected!" \
           "See documentation for valid types"
@@ -261,10 +261,22 @@ fi
 
 # delete the temp files
 if [ $clean -eq 1 ]; then
-  gzip $sample_dir/*.fq $sample_dir/*.fastq
-  rm $sample_dir/*.sorted.bam
-  rm $sample_dir/rsem/*.transcript.bam
-  rm -rf $temp_dir_s
+  # of the input was bam, keep the smaller bam and delete the fastq files
+  # if the input was fastq gzip them.
+  case $file_type in
+    "bam")
+      rm -v $sample_dir/*.fq
+      ;;
+    *)
+      gzip $sample_dir/*.fq $sample_dir/*.fastq
+      ;;
+  esac
+  # remove some other temp and unneeded files
+  rm -v $sample_dir/*.sorted.bam
+  rm -v $sample_dir/rsem/*.transcript.bam
+  rm -v $sample_dir/rsem/*.transcript.sorted.bam
+  rm -v $sample_dir/rsem/*.transcript.sorted.bam.bai
+  rm -rfv $temp_dir_s
 fi
 
 echo 'Finished RSEM RNA-seq pipeline for: '$sample_name
