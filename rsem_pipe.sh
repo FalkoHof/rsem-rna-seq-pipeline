@@ -193,9 +193,9 @@ if [ $run_rsem -eq 1 ]; then
   case $seq_type in
     "PE")
       trim_params=$trim_params" --paired\
-        $sample_dir/${f%.*}.1.fq $sample_dir/${f%.*}.2.fq"
-      fq1=$sample_dir/${f%.*}.1_val_1.fq
-      fq1=$sample_dir/${f%.*}.2_val_2.fq
+        $sample_dir/${f[0]} $sample_dir/${f[1]}"
+      fq1=$sample_dir/${f[0]%.*}_val_1.fq
+      fq2=$sample_dir/${f[1]%.*}_val_2.fq
       ;;
     "SE")
       trim_params=$trim_params" $sample_dir/${f%.*}.fq"
@@ -255,7 +255,8 @@ fi
 
 # run the rsem plot function
 if [ $make_plots -eq 1 ]; then
-  rsem-plot-model $sample_dir/rsem/$sample_name.stat $sample_dir/rsem/$sample_name.pdf
+  echo "rsem-plot-model $sample_dir/rsem/$sample_name.stat $sample_dir/rsem/$sample_name.pdf"
+  eval "rsem-plot-model $sample_dir/rsem/$sample_name.stat $sample_dir/rsem/$sample_name.pdf"
 fi
 
 # delete the temp files
